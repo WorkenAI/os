@@ -1,0 +1,13 @@
+{
+  "leadId": "lead-demo-001",
+  "company": "Alpha Platform Inc",
+  "contactName": "Irina Smirnova",
+  "contactEmail": "irina@alpha.example",
+  "budgetLabel": "$1.8M",
+  "budgetValue": 1800000,
+  "channel": "Website demo request",
+  "summary": "Large inbound lead requesting an enterprise pilot and custom commercial terms.",
+  "recommendation": "AI suggests qualifying the lead, preparing a follow-up, and routing a custom discount to Finance review.",
+  "nextAction": "Prepare a personalized follow-up and send the discount to Finance review.",
+  "requiresFinanceReview": true
+}
