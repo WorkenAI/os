@@ -1,0 +1,17 @@
+{
+  "name": "worken-os",
+  "private": true,
+  "packageManager": "bun@1.3.11",
+  "workspaces": ["apps/*", "packages/*"],
+  "scripts": {
+    "dev": "turbo dev",
+    "build": "turbo build",
+    "lint": "turbo lint",
+    "check-types": "turbo check-types",
+    "clean": "turbo clean"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.4.8",
+    "turbo": "^2.8.20"
+  }
+}
