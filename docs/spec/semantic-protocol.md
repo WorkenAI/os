@@ -4,6 +4,56 @@
 
 Draft
 
+## Normative and informative sections
+
+This specification contains both normative and informative content.
+
+### Normative content
+
+Normative content defines requirements for compliant authoring tools, compilers, and runtimes.
+Normative statements use the keywords:
+
+- MUST
+- MUST NOT
+- SHOULD
+- SHOULD NOT
+- MAY
+
+These keywords are to be interpreted as requirement levels of this specification.
+
+### Informative content
+
+Informative content exists to explain intent, provide examples, and illustrate possible implementations.
+Informative content does not define compliance requirements.
+
+Unless explicitly marked otherwise, the following sections are normative:
+
+- Purpose
+- Design goals
+- Non-goals
+- Core concepts
+- Normative minimal schema
+- Normative predicate and evaluation model
+- Execution model
+- Versioning
+
+The following sections are informative unless otherwise stated:
+
+- Problem
+- Authoring model
+- Example action card
+- Why action-centric authoring
+- Ownership and responsibility
+- Surface projections
+- Relationship to policy systems
+- Relationship to workflows
+- Informative compiled IR example
+- Compilation model
+- Recommended repository layout
+- Authoring rules
+
+---
+
 ## Purpose
 
 Worken OS Semantic Protocol defines a human-readable, machine-compilable way to describe:
@@ -122,7 +172,7 @@ The protocol describes **semantic availability and meaning**. Execution remains 
 
 ---
 
-## Core idea
+## Core concepts
 
 The central abstraction of the protocol is the **action card**.
 
@@ -151,38 +201,6 @@ normalized semantic IR
         ↓
 policy evaluation + surface projection + execution binding
 ```
-
----
-
-## Authoring model
-
-The authoring model is organized by:
-
-`domain → object → action`
-
-Example:
-
-```text
-docs/spec/
-domains/
-  operations/
-    task/
-      hand-off.md
-      assign-owner.md
-      publish.md
-```
-
-This structure is intentionally optimized for human navigation:
-
-- domain designers think in problem areas and boundaries
-- operators think in objects
-- users and agents think in actions
-
-The filesystem is an authoring convenience, not the semantic source of truth. The semantic source of truth is the compiled protocol graph built from stable IDs.
-
----
-
-## Core concepts
 
 ### Domain
 
@@ -264,11 +282,11 @@ A condition is a predicate that must hold for an action to be available.
 
 Examples:
 
-- `task.status == ready`
-- `task.assignee` exists
-- `actor.id == task.ownerId`
+- `object.status == "ready"`
+- `exists(object.assignee)`
+- `actor.id == object.ownerId`
 
-Conditions are evaluated against runtime context.
+Conditions are evaluated against runtime context (see [Normative predicate and evaluation model](#normative-predicate-and-evaluation-model)).
 
 ### Blocker
 
@@ -314,115 +332,81 @@ Examples:
 
 ---
 
-## Minimal action schema
+## Authoring model
 
-Each action definition SHOULD include the following fields:
+The authoring model is organized by:
 
-- id
-- domain
-- object
-- action
-- roles
-- when
-- blocked
-- effects
-- ui
-
-### Field meanings
-
-#### `id`
-
-Globally stable semantic identifier.
+`domain → object → action`
 
 Example:
 
-```yaml
-id: operations.task.hand-off
+```text
+docs/spec/
+domains/
+  operations/
+    task/
+      hand-off.md
+      assign-owner.md
+      publish.md
 ```
 
-#### `domain`
+This structure is intentionally optimized for human navigation:
 
-Domain name.
+- domain designers think in problem areas and boundaries
+- operators think in objects
+- users and agents think in actions
 
-```yaml
-domain: operations
-```
-
-#### `object`
-
-Object type.
-
-```yaml
-object: task
-```
-
-#### `action`
-
-Canonical action name.
-
-```yaml
-action: hand-off
-```
-
-#### `roles`
-
-List of roles allowed to attempt the action.
-
-```yaml
-roles:
-  - operator
-  - maintainer
-```
-
-#### `when`
-
-List of predicates that must hold for the action to be available.
-
-```yaml
-when:
-  - task.status == ready
-  - task.assignee exists
-```
-
-#### `blocked`
-
-Explicit blockers for explainability.
-
-```yaml
-blocked:
-  - code: wrong_status
-    message: Task must be in ready status
-  - code: missing_assignee
-    message: Task must have an assignee
-```
-
-#### `effects`
-
-Semantic outcomes of successful execution.
-
-```yaml
-effects:
-  - transfer ownership
-  - set task.updatedAt = now
-```
-
-#### `ui`
-
-Surface projection hints.
-
-```yaml
-ui:
-  label: Hand off
-  priority: primary
-  show_when_blocked: true
-```
+The filesystem is an authoring convenience, not the semantic source of truth. The semantic source of truth is the compiled protocol graph built from stable IDs.
 
 ---
 
-## Example action card
+## Normative minimal schema
 
-````markdown
----
+This section is normative.
+
+An action card MUST be a structured document that contains a metadata object with the following fields.
+
+### Required fields
+
+| Field | Type | Meaning |
+| --- | --- | --- |
+| `id` | string | Globally stable semantic identifier |
+| `domain` | string | Domain identifier |
+| `object` | string | Target object type |
+| `action` | string | Canonical action name |
+| `roles` | string[] | Roles that may attempt evaluation of the action |
+| `when` | PredicateExpression[] | Predicates that MUST evaluate to true for the action to be available |
+| `blocked` | Blocker[] | Explicit blocker definitions that explain unavailable states |
+| `effects` | Effect[] | Semantic outcomes of successful execution |
+| `ui` | UiHints | Surface projection hints |
+
+### Optional fields
+
+| Field | Type | Meaning |
+| --- | --- | --- |
+| `protocolVersion` | string | Protocol version understood by the author |
+| `title` | string | Human-readable title |
+| `description` | string | Human-readable description |
+| `appliesTo` | string[] | Additional compatible object kinds |
+| `tags` | string[] | Non-authoritative indexing metadata |
+
+### Structural requirements
+
+1. `id` MUST be globally unique within the compiled semantic graph.
+2. `domain`, `object`, and `action` MUST be stable semantic identifiers, not UI labels.
+3. `roles` MUST contain at least one role.
+4. `when` MAY be empty only if the action is always eligible for the listed roles.
+5. `blocked` MUST define at least one blocker whenever `when` is non-empty.
+6. Each blocker MUST contain:
+   - `code`
+   - `message`
+7. `ui.label` MUST be present.
+8. Unknown fields MUST be ignored by compliant runtimes unless the active protocol version defines them.
+
+### Canonical shape
+
+```yaml
+protocolVersion: 0.1
 id: operations.task.hand-off
 domain: operations
 object: task
@@ -433,132 +417,114 @@ roles:
   - maintainer
 
 when:
-  - task.status == ready
-  - task.assignee exists
+  - object.status == "ready"
+  - exists(object.assignee)
 
 blocked:
   - code: wrong_status
     message: Task must be in ready status
+    when: object.status != "ready"
   - code: missing_assignee
     message: Task must have an assignee
+    when: not exists(object.assignee)
 
 effects:
-  - transfer ownership
-  - set task.updatedAt = now
+  - kind: ownership.transfer
+  - kind: object.touch
+    field: updatedAt
+    value: now
 
 ui:
   label: Hand off
   priority: primary
-  show_when_blocked: true
----
-
-# Hand off
-
-Transfers responsibility for a ready task that already has an assignee.
-````
+  showWhenBlocked: true
+```
 
 ---
 
-## Why action-centric authoring
+## Normative predicate and evaluation model
 
-The protocol is action-centric because that is the most natural unit for both humans and agents.
+This section is normative.
 
-Humans think:
+### Evaluation context
 
-- what can I do with this object?
-- why can’t I do that yet?
-- what is the next step?
+Each action MUST be evaluated against an evaluation context with the following namespaces:
 
-Agents think:
+- `actor` — the subject attempting the action
+- `object` — the target object instance
+- `env` — runtime environment values
+- `time` — evaluation timestamp
+- `input` — optional user-supplied action input
 
-- what tools are currently available?
-- what preconditions are missing?
-- which action advances the objective?
+A runtime MAY provide domain aliases such as `task` for `object`, but the canonical namespace is `object`.
 
-By contrast, policy-first authoring usually forces people to think in fragmented abstractions such as:
+### Predicate language
 
-- allow / deny rules
-- state machine internals
-- UI visibility flags
-- backend-only guards
+A predicate expression MUST evaluate to either `true` or `false`.
 
-Worken OS Semantic Protocol unifies these perspectives around a single semantic unit.
+The minimal predicate language supports:
 
----
+- equality: `==`
+- inequality: `!=`
+- boolean conjunction: `and`
+- boolean disjunction: `or`
+- boolean negation: `not`
+- existence checks: `exists(path)`
+- membership checks: `in`
+- parenthesized grouping
 
-## Explainability model
+### Path resolution
 
-Explainability is a first-class part of the protocol.
+A path expression resolves against one of the evaluation namespaces.
 
-A blocked action MUST be representable as structured output.
+Examples:
 
-Example runtime projection:
+- `actor.id`
+- `actor.role`
+- `object.status`
+- `object.ownerId`
+- `env.workspaceId`
+
+A missing path resolves to `null`.
+
+### Truth rules
+
+1. An action is `available` only if:
+   - the actor role is listed in `roles`
+   - every expression in `when` evaluates to `true`
+2. An action is `blocked` if:
+   - the actor role is not listed in `roles`, or
+   - any expression in `when` evaluates to `false`
+3. A blocker is included in the evaluation result if:
+   - the blocker has no `when` predicate and the action is blocked, or
+   - the blocker `when` predicate evaluates to `true`
+
+### Blocker derivation
+
+Blockers are explanatory metadata, not primary policy rules.
+
+Normative rule:
+
+- `when` determines availability
+- `blocked` explains unavailability
+
+A compliant compiler SHOULD warn if a blocker cannot be matched to any failing condition.
+A compliant compiler MAY support derived blockers generated automatically from failed predicates, but authored blockers take precedence.
+
+### Evaluation result
+
+A runtime MUST be able to produce a result in this shape:
 
 ```yaml
-action: publish
+id: operations.task.hand-off
 status: blocked
+allowed: false
 reasons:
   - code: wrong_status
-    message: Task must be in review status
-  - code: missing_description
-    message: Task must have a description
+    message: Task must be in ready status
+  - code: missing_assignee
+    message: Task must have an assignee
 ```
-
-This enables:
-
-- disabled buttons with reasons in web UI
-- inline remediation in chat
-- spoken explanations in voice UI
-- better agent planning
-- auditable decision traces
-
-A system that knows an action is unavailable but cannot explain why is incomplete.
-
----
-
-## Surface projections
-
-The protocol must support multiple projections of the same semantic truth.
-
-### Web UI projection
-
-The runtime may render:
-
-- available actions
-- blocked actions
-- reason tooltips
-- primary next action
-- actions visible only to elevated roles
-
-### Chat projection
-
-The runtime may render:
-
-- suggested replies
-- slash commands
-- remediation prompts
-- structured action lists
-
-### Voice projection
-
-The runtime may render:
-
-- short action prompts
-- spoken blocker explanations
-- confirmation requirements
-- next-best-action phrasing
-
-### Agent projection
-
-The runtime may expose:
-
-- currently callable actions
-- blockers
-- missing prerequisites
-- semantic affordances
-- action selection metadata
-
-The protocol therefore separates **semantic truth** from **surface-specific presentation**.
 
 ---
 
@@ -595,7 +561,7 @@ Typical condition examples:
 
 ```yaml
 when:
-  - task.ownerId == actor.id
+  - object.ownerId == actor.id
 ```
 
 or
@@ -609,38 +575,173 @@ The protocol does not hardcode one ownership model. It only provides the semanti
 
 ---
 
-## Relationship to policy systems
+## Versioning
 
-The protocol is compatible with traditional policy systems, but not limited to them.
+The protocol should evolve explicitly.
 
-It can compile to or coexist with:
+Future action cards MAY include:
 
-- backend guards
-- RBAC/ABAC checks
-- OPA/Rego policies
-- workflow state evaluators
-- UI visibility logic
-- agent tool registries
+```yaml
+protocolVersion: 0.1
+```
 
-This separation mirrors established practice where human-oriented authoring is compiled into machine-evaluated runtime structures, rather than authored directly in low-level logic languages.
+The spec itself should maintain:
+
+- status
+- version
+- change log
+- migration notes
+
+For this initial draft, the protocol version is conceptual only.
 
 ---
 
-## Relationship to workflows
+## Example action card
 
-The protocol is not a full workflow language.
+````markdown
+---
+id: operations.task.hand-off
+domain: operations
+object: task
+action: hand-off
 
-However, it can represent workflow-adjacent semantics:
+roles:
+  - operator
+  - maintainer
 
-- allowed action by current state
-- expected next step
-- transition intent
-- remediation path
-- action availability over time
+when:
+  - object.status == "ready"
+  - exists(object.assignee)
 
-This makes the protocol complementary to workflow systems rather than a replacement for them.
+blocked:
+  - code: wrong_status
+    message: Task must be in ready status
+  - code: missing_assignee
+    message: Task must have an assignee
 
-A workflow engine may orchestrate long-running processes. Semantic Protocol tells the system what an actor can meaningfully do **now**.
+effects:
+  - kind: ownership.transfer
+  - kind: object.touch
+    field: updatedAt
+    value: now
+
+ui:
+  label: Hand off
+  priority: primary
+  showWhenBlocked: true
+---
+
+# Hand off
+
+Transfers responsibility for a ready task that already has an assignee.
+````
+
+---
+
+## Informative compiled IR example
+
+This section is informative.
+
+The following example shows one possible compiled representation of an authored action card.
+
+### Authored card
+
+```yaml
+id: operations.task.hand-off
+domain: operations
+object: task
+action: hand-off
+roles: [operator, maintainer]
+
+when:
+  - object.status == "ready"
+  - exists(object.assignee)
+
+blocked:
+  - code: wrong_status
+    message: Task must be in ready status
+    when: object.status != "ready"
+  - code: missing_assignee
+    message: Task must have an assignee
+    when: not exists(object.assignee)
+
+effects:
+  - kind: ownership.transfer
+  - kind: object.touch
+    field: updatedAt
+    value: now
+
+ui:
+  label: Hand off
+  priority: primary
+  showWhenBlocked: true
+```
+
+### Example compiled IR
+
+```json
+{
+  "id": "operations.task.hand-off",
+  "protocolVersion": "0.1",
+  "domain": "operations",
+  "object": "task",
+  "action": "hand-off",
+  "roles": ["operator", "maintainer"],
+  "eligibility": {
+    "all": [
+      { "op": "eq", "left": { "path": "object.status" }, "right": { "const": "ready" } },
+      { "op": "exists", "arg": { "path": "object.assignee" } }
+    ]
+  },
+  "blockers": [
+    {
+      "code": "wrong_status",
+      "message": "Task must be in ready status",
+      "when": {
+        "op": "ne",
+        "left": { "path": "object.status" },
+        "right": { "const": "ready" }
+      }
+    },
+    {
+      "code": "missing_assignee",
+      "message": "Task must have an assignee",
+      "when": {
+        "op": "not",
+        "arg": { "op": "exists", "arg": { "path": "object.assignee" } }
+      }
+    }
+  ],
+  "effects": [
+    { "kind": "ownership.transfer" },
+    { "kind": "object.touch", "field": "updatedAt", "value": "now" }
+  ],
+  "projection": {
+    "ui": {
+      "label": "Hand off",
+      "priority": "primary",
+      "showWhenBlocked": true
+    }
+  },
+  "bindings": {
+    "handlerKey": "operations.task.handOff"
+  }
+}
+```
+
+### Notes
+
+This IR is illustrative, not mandatory.
+The normative requirement is that a compiler preserves:
+
+- stable action identity
+- role constraints
+- predicate semantics
+- blocker explainability
+- effect semantics
+- surface projection metadata
+
+Important point: the **IR shape itself can stay informative**, while the semantic guarantees around it are normative. That gives you freedom to change implementation later.
 
 ---
 
@@ -688,6 +789,124 @@ References to runtime handlers or tool adapters.
 
 ---
 
+## Why action-centric authoring
+
+The protocol is action-centric because that is the most natural unit for both humans and agents.
+
+Humans think:
+
+- what can I do with this object?
+- why can’t I do that yet?
+- what is the next step?
+
+Agents think:
+
+- what tools are currently available?
+- what preconditions are missing?
+- which action advances the objective?
+
+By contrast, policy-first authoring usually forces people to think in fragmented abstractions such as:
+
+- allow / deny rules
+- state machine internals
+- UI visibility flags
+- backend-only guards
+
+Worken OS Semantic Protocol unifies these perspectives around a single semantic unit.
+
+---
+
+## Surface projections
+
+The protocol must support multiple projections of the same semantic truth.
+
+A blocked action MUST be representable as structured output (see [Evaluation result](#evaluation-result)). That enables:
+
+- disabled buttons with reasons in web UI
+- inline remediation in chat
+- spoken explanations in voice UI
+- better agent planning
+- auditable decision traces
+
+A system that knows an action is unavailable but cannot explain why is incomplete.
+
+### Web UI projection
+
+The runtime may render:
+
+- available actions
+- blocked actions
+- reason tooltips
+- primary next action
+- actions visible only to elevated roles
+
+### Chat projection
+
+The runtime may render:
+
+- suggested replies
+- slash commands
+- remediation prompts
+- structured action lists
+
+### Voice projection
+
+The runtime may render:
+
+- short action prompts
+- spoken blocker explanations
+- confirmation requirements
+- next-best-action phrasing
+
+### Agent projection
+
+The runtime may expose:
+
+- currently callable actions
+- blockers
+- missing prerequisites
+- semantic affordances
+- action selection metadata
+
+The protocol therefore separates **semantic truth** from **surface-specific presentation**.
+
+---
+
+## Relationship to policy systems
+
+The protocol is compatible with traditional policy systems, but not limited to them.
+
+It can compile to or coexist with:
+
+- backend guards
+- RBAC/ABAC checks
+- OPA/Rego policies
+- workflow state evaluators
+- UI visibility logic
+- agent tool registries
+
+This separation mirrors established practice where human-oriented authoring is compiled into machine-evaluated runtime structures, rather than authored directly in low-level logic languages.
+
+---
+
+## Relationship to workflows
+
+The protocol is not a full workflow language.
+
+However, it can represent workflow-adjacent semantics:
+
+- allowed action by current state
+- expected next step
+- transition intent
+- remediation path
+- action availability over time
+
+This makes the protocol complementary to workflow systems rather than a replacement for them.
+
+A workflow engine may orchestrate long-running processes. Semantic Protocol tells the system what an actor can meaningfully do **now**.
+
+---
+
 ## Recommended repository layout
 
 A recommended future layout is:
@@ -732,27 +951,6 @@ This is only a recommended authoring layout. Alternative layouts are acceptable 
 **Better:** `hand-off`, `publish`, `rollback`
 
 Action availability must come from semantic evaluation, not only UI flags.
-
----
-
-## Versioning
-
-The protocol should evolve explicitly.
-
-Future action cards MAY include:
-
-```yaml
-protocolVersion: 0.1
-```
-
-The spec itself should maintain:
-
-- status
-- version
-- change log
-- migration notes
-
-For this initial draft, the protocol version is conceptual only.
 
 ---
 
