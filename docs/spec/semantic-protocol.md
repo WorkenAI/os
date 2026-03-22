@@ -167,8 +167,20 @@ This protocol is not intended to be:
 - a transport protocol
 - a persistence format
 - a replacement for backend application logic
+- a full continuity model for durable responsibilities, claims, leases, wake triggers, or loop deduplication
 
-The protocol describes **semantic availability and meaning**. Execution remains the responsibility of runtime handlers.
+The protocol describes **semantic availability and meaning** centered on actions.
+
+It does not yet standardize continuity semantics for work that remains open over time, such as:
+
+- what responsibility remains open beyond a single interaction
+- who currently owns or has claimed that responsibility
+- when that responsibility should wake or be re-evaluated
+- how parallel planning or looping should be deduplicated before execution
+
+Those concerns likely require a companion semantic layer or follow-up specification. Until then, runtimes may implement them separately, but they are outside the scope of this draft.
+
+Execution remains the responsibility of runtime handlers.
 
 ---
 
