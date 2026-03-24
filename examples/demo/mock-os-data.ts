@@ -1,5 +1,5 @@
 import { DOMAIN_PRIMARY_COLORS } from '@worken/ir/domain-colors'
-import type { LandingDeliveryItem, LandingSceneTraffic } from '../../apps/landing/src/visualization/landing/types'
+import type { LandingDeliveryItem, LandingSceneTraffic } from './landing-scene-types'
 
 export type ShellEntityRecord = {
   id: string

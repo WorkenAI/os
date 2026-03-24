@@ -1,21 +1,22 @@
 {
-  "name": "@worken/landing",
+  "name": "@worken/landing-demo",
   "version": "0.0.1",
   "private": true,
-  "description": "Worken OS landing page",
+  "description": "Marketing / demo landing (not production web)",
   "type": "module",
   "scripts": {
-    "dev": "next dev --turbopack",
+    "dev": "next dev --turbopack -p 3001",
     "build": "next build",
-    "start": "next start",
+    "start": "next start -p 3001",
     "clean": "rm -rf .next .turbo node_modules/.cache",
     "lint": "biome lint src",
     "check-types": "bunx --bun tsc --noEmit"
   },
   "dependencies": {
-    "@worken/ir": "workspace:*",
-    "@worken/shell-web": "workspace:*",
     "@worken/demo": "workspace:*",
+    "@worken/ir": "workspace:*",
+    "@worken/next-os": "workspace:*",
+    "@worken/shell-web": "workspace:*",
     "@json-render/core": "^0.13.0",
     "@json-render/react": "^0.13.0",
     "@radix-ui/react-avatar": "^1.1.11",

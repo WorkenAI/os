@@ -1,5 +1,6 @@
 import path from 'node:path'
 import type { NextConfig } from 'next'
+import { withWorkenOS } from '@worken/next-os'
 import { withWorkflow } from '@workflow/next'
 
 const config: NextConfig = {
@@ -10,4 +11,4 @@ const config: NextConfig = {
   },
 }
 
-export default withWorkflow(config)
+export default withWorkflow(withWorkenOS(config))

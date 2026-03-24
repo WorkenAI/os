@@ -2,6 +2,7 @@ import { GeistSans } from 'geist/font/sans'
 import type { Metadata, Viewport } from 'next'
 import './globals.css'
 import { PermissionsProvider } from '@worken/shell-web/permissions/context'
+import { ShellThemeProvider } from '@worken/shell-web/theme'
 
 export const metadata: Metadata = {
   title: 'Worken OS — the operating system for people and agents',
@@ -17,6 +18,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     <html lang="en" className={GeistSans.variable}>
       <body className={`min-h-screen overflow-x-hidden antialiased ${GeistSans.className}`}>
         <PermissionsProvider>
+          <ShellThemeProvider>
           <div className="relative min-h-screen">
             <div aria-hidden className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
               <div
@@ -29,6 +31,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
             </div>
             <div className="relative z-10">{children}</div>
           </div>
+          </ShellThemeProvider>
         </PermissionsProvider>
       </body>
     </html>

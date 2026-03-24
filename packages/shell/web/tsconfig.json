@@ -8,9 +8,9 @@
       "@worken/ir/*": ["../ir/src/*"],
       "@worken/shell-web/*": ["./src/*"],
       "@worken/demo/*": ["../../../examples/demo/*"],
-      "@/components/*": ["../../../apps/landing/src/components/*"],
-      "@/lib/*": ["../../../apps/landing/src/lib/*"],
-      "@/execution/*": ["../../../apps/landing/src/execution/*"]
+      "@/components/*": ["../../../apps/web/src/components/*"],
+      "@/lib/*": ["../../../apps/web/src/lib/*"],
+      "@/execution/*": ["../../../apps/web/src/execution/*"]
     }
   },
   "include": ["src/**/*.ts", "src/**/*.tsx"]

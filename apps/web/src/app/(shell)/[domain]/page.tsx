@@ -5,7 +5,6 @@ import type { CSSProperties } from 'react'
 import { useEffect, useRef } from 'react'
 import { hexToRgbCsv, resolveDomainPrimaryColor } from '@worken/shell-web/domain-colors'
 import { ShellWindowControls } from '@worken/shell-web/layout/shell-window-controls'
-import { WorkenMockRuntimeProvider } from '@worken/demo/mock-os-runtime'
 import { ShellScreen } from '@worken/shell-web/runtime/screen/shell-screen'
 import { ShellSessionProvider, useShellSession } from '@worken/shell-web/session/context'
 import { WorkenOsWebMcpRegistrar } from '@worken/shell-web/webmcp/registrar'
@@ -100,11 +99,9 @@ export default function DomainPage() {
   const domainId = params.domain
 
   return (
-    <WorkenMockRuntimeProvider>
-      <ShellSessionProvider key={domainId}>
-        <WorkenOsWebMcpRegistrar />
-        <DomainPageInner domainId={domainId} />
-      </ShellSessionProvider>
-    </WorkenMockRuntimeProvider>
+    <ShellSessionProvider key={domainId}>
+      <WorkenOsWebMcpRegistrar />
+      <DomainPageInner domainId={domainId} />
+    </ShellSessionProvider>
   )
 }

@@ -93,7 +93,10 @@ flowchart TB
 
 | Path | Role |
 |------|------|
-| `apps/landing` | Next.js app (marketing / shell entrypoints) |
+| `apps/web` | Next.js production app (shell routes, APIs, `useOS`) |
+| `examples/landing-demo` | Marketing / 3D demo landing (optional; port 3001) |
+| `examples/demo` | Mock runtime data for demos |
+| `packages/next-os` | `withWorkenOS` Next.js config helper |
 | `packages/tsconfig` | Shared TypeScript presets (`@worken/tsconfig`) |
 
 ## Development

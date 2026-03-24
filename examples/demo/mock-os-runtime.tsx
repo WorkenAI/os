@@ -20,6 +20,12 @@ type WorkenMockRuntimeApi = {
   getViewData: (domainId: string, viewId: string | null | undefined) => MockShellViewData | null
 }
 
+const nullRuntimeApi: WorkenMockRuntimeApi = {
+  sceneTraffic: { rolePackets: [] },
+  getEntityRecord: () => null,
+  getViewData: () => null,
+}
+
 const WorkenMockRuntimeContext = createContext<WorkenMockRuntimeApi | null>(null)
 
 export function WorkenMockRuntimeProvider({ children }: { children: ReactNode }) {
@@ -57,10 +63,5 @@ export function WorkenMockRuntimeProvider({ children }: { children: ReactNode })
 
 export function useWorkenMockRuntime() {
   const context = use(WorkenMockRuntimeContext)
-
-  if (!context) {
-    throw new Error('useWorkenMockRuntime must be used inside WorkenMockRuntimeProvider')
-  }
-
-  return context
+  return context ?? nullRuntimeApi
 }

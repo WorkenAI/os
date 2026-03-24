@@ -24,6 +24,7 @@
     "zod": "^4.3.6"
   },
   "dependencies": {
+    "@worken/demo": "workspace:*",
     "@worken/ir": "workspace:*"
   },
   "devDependencies": {

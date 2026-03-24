@@ -1,0 +1,24 @@
+{
+  "extends": "../../packages/tsconfig/next.json",
+  "compilerOptions": {
+    "types": ["bun-types"],
+    "paths": {
+      "@/components/ui/*": ["../../apps/web/src/components/ui/*"],
+      "@/lib/*": ["../../apps/web/src/lib/*"],
+      "@/execution/*": ["../../apps/web/src/execution/*"],
+      "@/*": ["./src/*"],
+      "@worken/ir/*": ["../../packages/ir/src/*"],
+      "@worken/shell-web/*": ["../../packages/shell/web/src/*"],
+      "@worken/demo/*": ["../demo/*"],
+      "@worken/landing/*": ["./src/*"]
+    }
+  },
+  "include": [
+    "next-env.d.ts",
+    ".next/types/**/*.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/dev/types/**/*.ts"
+  ],
+  "exclude": ["node_modules"]
+}

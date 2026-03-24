@@ -4,11 +4,11 @@
   "private": true,
   "type": "module",
   "exports": {
+    "./landing-scene-types": "./landing-scene-types.ts",
     "./*": "./*"
   },
   "dependencies": {
     "@worken/ir": "workspace:*",
-    "@worken/shell-web": "workspace:*",
     "@xstate/react": "^6.1.0",
     "xstate": "^5.28.0"
   },
