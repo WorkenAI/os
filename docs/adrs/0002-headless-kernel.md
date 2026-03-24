@@ -14,6 +14,7 @@ The v0 headless kernel consists of:
 
 - **Semantic graph** (`@worken/semantic-core`) — operational semantics, compile, predicate evaluation.
 - **Semantic IR** (`@worken/semantic-ir`) — canonical deterministic projection of the compiled graph for MCP, shell, and policy consumers (ADR 0004).
+- **Semantic projection** (`@worken/semantic-projection`) — slice → `ProjectionModel` → JSON / LLM / ASCII / Mermaid (ADR 0005).
 - **Platform graph** (`@worken/platform-core`) — subsystems, packages, contracts, invariants, examples, ADRs.
 - **Context bundler** (`@worken/context-core`) — task presets and `ContextBundle` assembly.
 - **Session coordination** (`@worken/session-core`) — minimal `WorkSession` without persistence.

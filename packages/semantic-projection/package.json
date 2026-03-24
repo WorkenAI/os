@@ -1,9 +1,9 @@
 {
-	"name": "@worken/platform-mcp",
+	"name": "@worken/semantic-projection",
 	"version": "0.0.1",
 	"private": false,
 	"type": "module",
-	"description": "Read-only MCP server for Worken platform and semantic graphs",
+	"description": "Semantic projection engine: IR slice → projection model → JSON / LLM / ASCII / Mermaid",
 	"exports": {
 		".": {
 			"types": "./dist/index.d.ts",
@@ -11,9 +11,7 @@
 		}
 	},
 	"types": "./dist/index.d.ts",
-	"files": [
-		"dist"
-	],
+	"files": ["dist"],
 	"scripts": {
 		"build": "tsc -p tsconfig.json",
 		"clean": "rm -rf dist .turbo",
@@ -22,13 +20,8 @@
 		"test": "node --import tsx --test src/**/*.test.ts"
 	},
 	"dependencies": {
-		"@modelcontextprotocol/sdk": "^1.27.1",
-		"@worken/context-core": "workspace:*",
-		"@worken/platform-core": "workspace:*",
-		"@worken/semantic-core": "workspace:*",
 		"@worken/semantic-ir": "workspace:*",
-		"@worken/semantic-projection": "workspace:*",
-		"zod": "^4.3.6"
+		"@worken/semantic-core": "workspace:*"
 	},
 	"devDependencies": {
 		"@types/node": "^22.10.0",

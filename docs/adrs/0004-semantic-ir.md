@@ -34,4 +34,5 @@ The Semantic Protocol (see `docs/spec/semantic-protocol.md`) defines meaning; **
 
 - `docs/spec/semantic-protocol.md`
 - `docs/spec/semantic-ir.md`
+- `docs/adrs/0005-semantic-projection-engine.md`
 - `packages/semantic-ir/`

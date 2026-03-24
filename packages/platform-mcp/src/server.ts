@@ -12,6 +12,7 @@ import {
 	listAllowedActions,
 	type SemanticIR,
 } from "@worken/semantic-ir";
+import { projectAndRender } from "@worken/semantic-projection";
 import { z } from "zod";
 
 function templateId(
@@ -91,7 +92,7 @@ export function createPlatformMcpServer(
 		{ name: "worken-platform", version: "0.0.1" },
 		{
 			instructions:
-				"Read-only Worken platform MCP: platform + semantic graphs, Semantic IR (canonical operational slice), context bundles, and explain/list tools. No writes.",
+				"Read-only Worken platform MCP: platform + semantic graphs, Semantic IR, projection renders (JSON/LLM/ASCII/Mermaid via render_semantic_slice), context bundles, explain/list tools. No writes.",
 		},
 	);
 
@@ -664,6 +665,44 @@ export function createPlatformMcpServer(
 						text: JSON.stringify(s ?? null, null, 2),
 					},
 				],
+			};
+		},
+	);
+
+	mcp.registerTool(
+		"render_semantic_slice",
+		{
+			description:
+				"Resolve a Semantic IR slice around targetId and render as JSON projection model, LLM-oriented text, ASCII tree, or Mermaid flowchart.",
+			inputSchema: {
+				targetId: z.string(),
+				format: z.enum(["json", "llm", "ascii", "mermaid"]),
+				asciiMode: z.enum(["compact", "expanded"]).optional(),
+			},
+		},
+		async (args) => {
+			const text = projectAndRender(
+				semanticIr,
+				args.targetId,
+				args.format,
+				args.asciiMode !== undefined ? { asciiMode: args.asciiMode } : undefined,
+			);
+			if (text === null) {
+				return {
+					content: [
+						{
+							type: "text" as const,
+							text: JSON.stringify(
+								{ error: "not_found", targetId: args.targetId },
+								null,
+								2,
+							),
+						},
+					],
+				};
+			}
+			return {
+				content: [{ type: "text" as const, text }],
 			};
 		},
 	);

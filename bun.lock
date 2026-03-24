@@ -125,6 +125,7 @@
         "@worken/platform-core": "workspace:*",
         "@worken/semantic-core": "workspace:*",
         "@worken/semantic-ir": "workspace:*",
+        "@worken/semantic-projection": "workspace:*",
         "zod": "^4.3.6",
       },
       "devDependencies": {
@@ -167,6 +168,20 @@
       "version": "0.0.1",
       "dependencies": {
         "@worken/semantic-core": "workspace:*",
+      },
+      "devDependencies": {
+        "@types/node": "^22.10.0",
+        "@worken/tsconfig": "workspace:*",
+        "tsx": "^4.19.2",
+        "typescript": "^5.9.3",
+      },
+    },
+    "packages/semantic-projection": {
+      "name": "@worken/semantic-projection",
+      "version": "0.0.1",
+      "dependencies": {
+        "@worken/semantic-core": "workspace:*",
+        "@worken/semantic-ir": "workspace:*",
       },
       "devDependencies": {
         "@types/node": "^22.10.0",
@@ -751,6 +766,8 @@
     "@worken/semantic-core": ["@worken/semantic-core@workspace:packages/semantic-core"],
 
     "@worken/semantic-ir": ["@worken/semantic-ir@workspace:packages/semantic-ir"],
+
+    "@worken/semantic-projection": ["@worken/semantic-projection@workspace:packages/semantic-projection"],
 
     "@worken/session-core": ["@worken/session-core@workspace:packages/session-core"],
 
