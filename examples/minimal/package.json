@@ -1,0 +1,26 @@
+{
+	"name": "@worken/examples-minimal",
+	"version": "0.0.1",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"build": "tsc -p tsconfig.json",
+		"build-bundle": "bun run ./dist/build-bundle.js",
+		"mcp-server": "bun run ./dist/mcp-server.js",
+		"lint": "biome lint .",
+		"check-types": "tsc -p tsconfig.json --noEmit",
+		"clean": "rm -rf dist .turbo"
+	},
+	"dependencies": {
+		"@worken/context-core": "workspace:*",
+		"@worken/platform-core": "workspace:*",
+		"@worken/platform-mcp": "workspace:*",
+		"@worken/semantic-core": "workspace:*",
+		"@modelcontextprotocol/sdk": "^1.27.1"
+	},
+	"devDependencies": {
+		"@types/node": "^22.10.0",
+		"@worken/tsconfig": "workspace:*",
+		"typescript": "^5.9.3"
+	}
+}

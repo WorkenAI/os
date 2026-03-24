@@ -10,7 +10,8 @@
     "start": "next start",
     "clean": "rm -rf .next .turbo node_modules/.cache",
     "lint": "biome lint src",
-    "check-types": "bunx --bun tsc --noEmit"
+    "check-types": "bunx --bun tsc --noEmit",
+    "test": "node -e \"process.exit(0)\""
   },
   "dependencies": {
     "@json-render/core": "^0.13.0",

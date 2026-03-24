@@ -137,6 +137,7 @@ The same semantic definition should project into:
 - chat UI
 - voice UI
 - agent tool selection
+- model context (prompts, citations, compact cards for LLMs)
 - API exposure
 
 ### 5. Action-centric
@@ -793,6 +794,7 @@ Derived representations for:
 - web shell
 - chat shell
 - voice shell
+- model context
 - agent runtime
 
 ### 5. Execution bindings
@@ -881,6 +883,39 @@ The runtime may expose:
 - action selection metadata
 
 The protocol therefore separates **semantic truth** from **surface-specific presentation**.
+
+### Model-context projection
+
+**Normative.** `model-context` is a first-class projection target for compiled semantic nodes (for example, projection nodes whose `target` is `model-context`). Runtimes that assemble prompts, tool lists, or RAG context for agents MUST treat model-context projections as a supported surface alongside web, chat, voice, and API projections.
+
+Authoring tools SHOULD allow defining how an action or semantic unit is summarized or structured for inclusion in model context (for example, compact card text, field hints, or citation ids).
+
+---
+
+## Compiled semantic graph guarantees
+
+**Normative.** A compliant compiler that emits a compiled semantic graph MUST preserve the following so that all consumers (UI, agents, MCP, workflows) share one interpretation:
+
+1. **Stable ids** — Node and relation identifiers MUST remain stable across refactors that do not change semantic identity. File paths MUST NOT be the sole source of identity.
+2. **Relation kinds** — Only relation kinds defined by the protocol version (or explicitly extended under documented rules) MAY appear in the compiled graph.
+3. **Binding metadata** — Execution bindings (handler keys, tool keys, side-effect class, approval requirements) MUST be recorded on binding nodes or equivalent IR so runtimes can route execution without re-parsing markdown.
+4. **Deprecation metadata** — When a node is superseded or deprecated, `deprecatedSince` and `supersededBy` (or equivalent) MUST be present on the compiled node so clients can migrate deterministically.
+
+---
+
+## Action cards vs canonical runtime truth
+
+**Normative.** Action cards (human-authored units) are the primary authoring format; the **canonical runtime truth** for availability, eligibility, and structure is the **compiled semantic graph** (normalized nodes, relations, indexes). Runtimes MUST evaluate against the compiled graph, not against raw authoring files alone.
+
+Authoring tools MAY keep auxiliary formats; the compiler is responsible for producing the graph that is authoritative for evaluation.
+
+---
+
+## Contributor platform graph vs runtime semantics
+
+**Normative.** The **contributor / platform graph** (subsystems, packages, contracts, invariants, ADRs, examples) describes how the product and repository are structured and governed. It MUST NOT be confused with **runtime domain semantics** (customer objects, live state, workflow execution).
+
+These two layers MAY reference each other (for example, a platform invariant constraining an adapter), but compilers and tools MUST keep their storage, compilation, and delivery paths distinct so that contributor truth and operational domain truth do not collapse into a single undifferentiated graph.
 
 ---
 

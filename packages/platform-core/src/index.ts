@@ -1,0 +1,20 @@
+export { compilePlatform, relatedPlatformNodes } from "./compile.js";
+export type {
+	AdrNode,
+	CodeRef,
+	ContractNode,
+	ExampleNode,
+	ExtensionPointNode,
+	FlowNode,
+	GlossaryTermNode,
+	InvariantNode,
+	PackageNode,
+	PlatformGraph,
+	PlatformNode,
+	PlatformNodeBase,
+	PlatformNodeKind,
+	PlatformRelation,
+	PlatformRelationKind,
+	PlatformSource,
+	SubsystemNode,
+} from "./model.js";

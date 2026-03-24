@@ -1,0 +1,35 @@
+{
+	"name": "@worken/context-core",
+	"version": "0.0.1",
+	"private": false,
+	"type": "module",
+	"description": "Compact context bundles for code agents",
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"import": "./dist/index.js"
+		}
+	},
+	"types": "./dist/index.d.ts",
+	"files": [
+		"dist"
+	],
+	"scripts": {
+		"build": "tsc -p tsconfig.json",
+		"clean": "rm -rf dist .turbo",
+		"lint": "biome lint src",
+		"check-types": "tsc -p tsconfig.json --noEmit",
+		"test": "node --import tsx --test src/**/*.test.ts"
+	},
+	"dependencies": {
+		"@worken/platform-core": "workspace:*",
+		"@worken/semantic-core": "workspace:*",
+		"@worken/session-core": "workspace:*"
+	},
+	"devDependencies": {
+		"@types/node": "^22.10.0",
+		"@worken/tsconfig": "workspace:*",
+		"tsx": "^4.19.2",
+		"typescript": "^5.9.3"
+	}
+}
