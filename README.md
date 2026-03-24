@@ -26,7 +26,9 @@ See `docs/adrs/0002-headless-kernel.md` and `docs/spec/semantic-protocol.md` for
 
 ### Minimal example
 
-`examples/minimal` demonstrates compiling semantic/platform sources, printing a bundle, and bootstrapping the MCP server (stdio):
+`examples/minimal` is a **demo dataset** (small semantic + platform sources). It uses the same libraries as the rest of the repo: graphs are compiled, then passed into **`@worken/platform-mcp`** (`createPlatformMcpServer`). It does not replace “Worken OS” — it shows the wiring; a production setup feeds the same server **larger graphs** built from your canonical manifests or codegen.
+
+See `examples/minimal/README.md` for details.
 
 ```bash
 cd examples/minimal
