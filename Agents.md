@@ -1,93 +1,121 @@
-# Agents: architecture and tooling (Worken OS)
+# Agents: how to work in this repo
 
-This document is for **coding agents** (and humans driving them) working in this repository. It explains how the **headless kernel** turns sources into graphs, **Semantic IR**, **projections**, and **MCP** — so you know what to use instead of guessing from folder layout alone.
+This file is a **playbook**, not a spec. For definitions and normative rules, see `docs/spec/` and `docs/adrs/`.
 
-## Mental model
+---
 
-Worken OS separates **meaning** from **delivery**:
+## What you should use first
 
-1. **Authoring** — manifests, TypeScript sources, docs overlays (not canonical alone).
-2. **Compile** — merge sources → **`SemanticGraph`** (`@worken/semantic-core`) and **`PlatformGraph`** (`@worken/platform-core`).
-3. **Canonical operational shape** — **`Semantic IR`** (`@worken/semantic-ir`): deterministic `snapshotId`, entities, roles, actions, policies, surfaces, bindings.
-4. **Projection** — a **slice** of IR → **`ProjectionModel`** → render as JSON / LLM text / ASCII / Mermaid (`@worken/semantic-projection`). Renderers do **not** scrape the repo; they consume normalized slices.
-5. **Delivery** — **MCP** (`@worken/platform-mcp`) exposes resources and tools; **`repo-mcp`** builds graphs from **this** monorepo and optional code-graph.
+1. **MCP** (`bun run mcp` from repo root) when you need **architecture truth**, **invariants**, **package graph**, **semantic IR**, or **“is this action allowed?”** — not when you only need to find a string in files.
+2. **Read files / grep / tests** when you are **editing code**, **tracing a call stack**, or **running the build**.
 
-```
-Authoring → compile → SemanticGraph + PlatformGraph
-              → Semantic IR (canonical)
-              → resolve slice → ProjectionModel → render (json | llm | ascii | mermaid)
-              → MCP / future shell / CLI
-```
+If MCP is connected, **call tools** instead of inventing node IDs from memory. Use `get_node` with an id from a previous response, or discover nodes via `bundle_for_task` / `show_invariants` / `worken://glossary`.
 
-## Packages (what each layer is for)
+---
 
-| Package | Role for agents |
-|--------|------------------|
-| `@worken/semantic-core` | Compiled semantic graph, predicates, `evaluateAction` / `evaluatePredicate`. |
-| `@worken/semantic-ir` | `compileSemanticIR`, `explainAction`, `listAllowedActions`, stable `snapshotId`. |
-| `@worken/semantic-projection` | `resolveSlice` → `buildProjectionModel` → `renderProjection` / `projectAndRender`. |
-| `@worken/platform-core` | Repo/contributor graph: packages, subsystems, invariants, ADRs, examples. |
-| `@worken/context-core` | `buildContextBundle`, task presets (`onboard_repo`, `add_mcp_resource`, …). |
-| `@worken/platform-mcp` | MCP server: resources `worken://…`, tools (see below). **Read-only.** |
-| `@worken/repo-mcp` | Loads **this** workspace (from root `workspaces`), manifest overlay, semantic overlays, **Semantic IR demo** slice, **always** merges `@worken/code-graph`. |
-| `@worken/code-graph` | TS compiler API → package/symbol edges; projected into platform graph for MCP. |
+## First-time orientation (5 minutes)
 
-## Running the model-context stack locally
+| Step | Do this |
+|------|--------|
+| 1 | From repo root: `bun install` (once). |
+| 2 | Run or attach MCP: `bun run mcp` (stdio). In Cursor, use `.cursor/mcp.json` if present. |
+| 3 | Call **`bundle_for_task`** with `task: "onboard_repo"`, `depth: "compact"` — you get glossary, repo invariants, examples. |
+| 4 | Call **`show_invariants`** with `area: "mcp"` to see the read-only rule for this server. |
+| 5 | Skim **`worken://thesis`** resource if the client supports resources — one-screen intent of the headless kernel. |
 
-From the **repository root** (after `bun install`):
+---
 
-| Command | Purpose |
-|---------|---------|
-| `bun run mcp` | Stdio MCP: live repo + code graph + IR demo; primary integration for agents. |
-| `bun run code-graph` | Dump code-graph JSON (optional `WORKEN_CODE_GRAPH_PACKAGES=…` to narrow). |
-| `bun run test` | Monorepo tests. |
-| `bun run check-types` | Typecheck. |
-| `bun run lint` | Biome. |
+## If you are trying to…
 
-Cursor can use `.cursor/mcp.json` to launch the same `repo-mcp` entrypoint.
+### Understand the repo layout (packages, apps)
 
-## MCP: resources and tools (high level)
+- **`bundle_for_task`** (`onboard_repo`) for a **curated slice**.
+- **`get_node`** with `graph: "platform"` and id like **`package.worken.semantic-core`** (workspace scan: `package.` + npm name with `@` → drop, `/` → `.`).
+- **`related_nodes`** from that package id to see subsystem and neighbors.
 
-**Resources** (URIs are stable handles, not file paths):
+**Do not** assume every `package.json` on disk is a workspace package; the scanner follows root `workspaces` (direct children only).
 
-- `worken://thesis` — short thesis markdown.
-- `worken://glossary` — glossary terms from graphs.
-- `worken://semantic-ir` — full **Semantic IR** JSON (includes `schema.snapshotId`).
-- Templates: `worken://subsystems/{id}`, `worken://packages/{id}`, `worken://contracts/{id}`, `worken://flows/{id}`, `worken://examples/{id}`, `worken://adrs/{id}`.
+### See how TypeScript packages depend on each other (symbols / exports)
 
-**Tools** (non-exhaustive; discover via `list_tools`):
+- Use the **code graph** layer: **`get_node`** / **`related_nodes`** with ids prefixed like **`pkg.worken.semantic-core`** (from code-graph merge), or run **`bun run code-graph`** locally for raw JSON.
+- **Semantic IR** is about **actions/policies**; **code graph** is about **modules and exports**. Use both when the task needs both.
 
-- Graph navigation: `get_node`, `related_nodes`, `show_invariants`, `find_examples`, `impact_of_change`.
-- Task context: `bundle_for_task` (preset task strings + optional `area` / `depth`).
-- Operational semantics: `list_allowed_actions`, `explain_action` (subject/object JSON + optional `roleId`).
-- Surfaces: `resolve_surface` (IR surface node).
-- Projections: `render_semantic_slice` — `targetId` + `format` (`json` \| `llm` \| `ascii` \| `mermaid`) + optional `asciiMode` (`compact` \| `expanded`).
+### Reason about “what is allowed” for a demo action (Semantic IR)
 
-**Important:** the platform MCP server is **read-only** (no repo writes). Canonical invariant: see `invariant.repo.mcp-readonly` in the live graph.
+The live MCP includes a **small demo** (recruitment example). Typical ids:
 
-## IDs agents should know
+- Action: **`action.candidate.schedule_interview`**
+- Roles: **`role.hr_manager`**, **`role.recruiter_bot`**
+- Surface: **`surface.candidate.detail`**
 
-- **Workspace packages** (from scan): `package.<npm>` with `@` and `/` turned into segments, e.g. `@worken/semantic-core` → `package.worken.semantic-core`.
-- **Code graph** nodes often use prefixes like `pkg.worken.semantic-core`, `sym.…`, `surface.…` — see `get_node` / IR as needed.
-- **Semantic IR demo** (when merged by `repo-mcp`): example action id `action.candidate.schedule_interview`, surface `surface.candidate.detail`, roles `role.hr_manager`, `role.recruiter_bot`.
+**Workflow:**
 
-## Normative docs
+1. **`explain_action`** — pass `actionId`, JSON **`object`** (e.g. `{ "status": "qualified", "phone": "+1" }`), **`subject`** usually `{}`, optional **`roleId`**.
+2. **`list_allowed_actions`** — same subject/object/role; get a list of allowed action ids under current predicates.
+3. **`render_semantic_slice`** — `targetId: "action.candidate.schedule_interview"`, `format: "llm"` (readable summary) or `"mermaid"` (diagram). Use `format: "json"` for the full **projection model**.
 
-- `docs/spec/semantic-protocol.md` — Semantic Protocol (normative rules).
-- `docs/spec/semantic-ir.md` — Semantic IR.
-- `docs/spec/semantic-projection.md` — projection pipeline.
-- `docs/spec/code-semantics-bridge.md` — TS → graph bridge.
-- `docs/adrs/` — ADRs including headless kernel (0002), code semantics (0003), Semantic IR (0004), projection engine (0005).
+### Get task-shaped context (PR style: adapter, MCP resource, etc.)
 
-## Practical workflow for agents
+- **`bundle_for_task`** with a preset id: `onboard_repo`, `add_mcp_resource`, `add_adapter`, … optional **`area`**, **`depth`** `compact` | `normal`.
+- This is **context bundling**, not intent resolution — it does not execute workflows.
 
-1. Prefer **`bun run mcp`** + MCP tools over raw `grep` when you need **invariants, packages, IR, or explainability**.
-2. Use **`bundle_for_task`** for task-shaped context; use **`explain_action`** / **`list_allowed_actions`** when reasoning about **allowed operations** from IR.
-3. Use **`render_semantic_slice`** with `format: "llm"` or `"mermaid"` when you need a **single slice** explained consistently in text or diagram form.
-4. Use **`worken://semantic-ir`** or `render_semantic_slice` + `json` when you need the **full canonical IR** or a structured projection.
-5. Remember **code graph** is structural (exports/imports); **semantic IR** is operational policy/actions — complementary layers.
+### Check impact before editing a package node
 
-## Scope limits (v0)
+- **`impact_of_change`** with **`nodeId`** — e.g. `package.worken.semantic-core` (platform id from workspace scan).
 
-- MCP does not replace a shell or workflow engine; it **exposes** compiled truth and bundles.
-- Full product domain + persistence + `resolve_intent` with session state are **out of scope** for this repo’s v0 stack; the **pipeline** (IR → slice → projection → MCP) is the extension point.
+### Read canonical Semantic IR as JSON
+
+- Resource **`worken://semantic-ir`**, or **`render_semantic_slice`** with `format: "json"` and a concrete **`targetId`** for a **slice projection** (smaller, focused).
+
+---
+
+## MCP tools — cheat sheet
+
+Use **`list_tools`** in the client for the full list; common ones:
+
+| Tool | When to use it |
+|------|----------------|
+| `bundle_for_task` | Task presets + invariants + examples + related nodes. |
+| `get_node` | One node by id (`semantic` or `platform`). |
+| `related_nodes` | Neighborhood in the graph. |
+| `show_invariants` | Filter invariants by substring (`area`). |
+| `find_examples` | Example nodes (optional `kind`). |
+| `impact_of_change` | Impact bundle around a node id. |
+| `explain_action` | Allow/deny + reason for one action + subject/object JSON. |
+| `list_allowed_actions` | All actions allowed for given subject/object/role. |
+| `resolve_surface` | One IR surface record by id. |
+| `render_semantic_slice` | Slice → **llm** / **ascii** / **mermaid** / **json** projection. |
+
+**Hard rule:** this MCP server is **read-only** — it does not edit the repo. See invariant `invariant.repo.mcp-readonly` via `show_invariants`.
+
+---
+
+## Node IDs: avoid mixing two schemes
+
+You may see **both**:
+
+- **Platform scan:** `package.worken.foo` (from workspace `package.json` scan).
+- **Code graph:** `pkg.worken.foo` (TypeScript graph).
+
+If **`get_node`** returns `null`, you picked the wrong prefix or graph — try the other prefix or `graph: "semantic"`.
+
+---
+
+## Local commands (no MCP)
+
+| Command | Use when |
+|---------|----------|
+| `bun run test` | You changed packages; run tests. |
+| `bun run check-types` | You changed TS types. |
+| `bun run lint` | Before commit (Biome). |
+| `bun run code-graph` | You need raw code-graph JSON offline. |
+
+---
+
+## Where the “spec” lives
+
+- **Semantic protocol:** `docs/spec/semantic-protocol.md`
+- **Semantic IR & projection:** `docs/spec/semantic-ir.md`, `docs/spec/semantic-projection.md`
+- **ADRs:** `docs/adrs/` (kernel, IR, projection engine, code semantics bridge)
+
+Use those when you need **exact definitions**; use **this file** for **what to run and in what order**.

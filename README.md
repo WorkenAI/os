@@ -26,7 +26,7 @@ Flow: **manifests / sources → graphs → Semantic IR → context bundles / MCP
 | `@worken/repo-mcp` | **Scan this monorepo** (`package.json` in `apps/` and `packages/`) and feed the result into `@worken/platform-mcp` — no toy dataset |
 | `@worken/code-graph` | TypeScript Compiler API → **code IR** (exports, `depends-on`, symbols); merged into MCP by default |
 
-See `docs/adrs/0002-headless-kernel.md`, `docs/adrs/0004-semantic-ir.md`, `docs/adrs/0005-semantic-projection-engine.md`, `docs/spec/semantic-ir.md`, `docs/spec/semantic-projection.md`, and `docs/spec/semantic-protocol.md` for protocol details.
+For **how to use** the headless stack and MCP as a coding agent, see **`Agents.md`**. For protocol definitions, see `docs/adrs/0002-headless-kernel.md`, `docs/adrs/0004-semantic-ir.md`, `docs/adrs/0005-semantic-projection-engine.md`, `docs/spec/semantic-ir.md`, `docs/spec/semantic-projection.md`, and `docs/spec/semantic-protocol.md`.
 
 ### MCP: this repository as model context
 
@@ -140,6 +140,7 @@ flowchart TB
 
 | Path | Role |
 |------|------|
+| `Agents.md` | **Agent playbook**: how to use MCP and local commands (not the normative spec) |
 | `apps/landing` | Next.js app (marketing / shell entrypoints) |
 | `packages/tsconfig` | Shared TypeScript presets (`@worken/tsconfig`) |
 | `packages/*` | Libraries: ids, semantic-core, **semantic-ir**, platform-core, session-core, context-core, testkit, platform-mcp, **repo-mcp** (monorepo → MCP) |
