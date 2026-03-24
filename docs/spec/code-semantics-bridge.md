@@ -58,6 +58,10 @@ Downstream **impact**: if `SemanticGraph` changes in `@worken/semantic-core`, re
 - Replacing `tsserver` or duplicating its full type checker in Worken.
 - Claiming TS **types** as domain **semantic** truth without authored alignment.
 
+## Implementation in this repo
+
+The package **`@worken/code-graph`** builds a normalized `CodeGraph` from the TypeScript program and can project it into **`PlatformSource`** via `codeGraphToPlatformSource()` for merging with `repo-mcp` when `WORKEN_MCP_CODE_GRAPH=1`.
+
 ## References
 
 - ADR 0003: TypeScript code semantics bridge

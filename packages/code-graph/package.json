@@ -1,9 +1,9 @@
 {
-	"name": "@worken/repo-mcp",
+	"name": "@worken/code-graph",
 	"version": "0.0.1",
 	"private": true,
 	"type": "module",
-	"description": "Scan the Worken OS monorepo and serve it as MCP model context",
+	"description": "Build Worken-style code IR from TypeScript compiler (exports, imports, package deps)",
 	"exports": {
 		".": {
 			"types": "./dist/index.d.ts",
@@ -19,20 +19,15 @@
 		"clean": "rm -rf dist .turbo",
 		"lint": "biome lint src",
 		"check-types": "tsc -p tsconfig.json --noEmit",
-		"test": "node --import tsx --test src/**/*.test.ts",
-		"mcp": "bun run ./src/mcp-stdio.ts"
+		"test": "node --import tsx --test src/**/*.test.ts"
 	},
 	"dependencies": {
-		"@worken/code-graph": "workspace:*",
 		"@worken/platform-core": "workspace:*",
-		"@worken/platform-mcp": "workspace:*",
-		"@worken/semantic-core": "workspace:*"
+		"typescript": "^5.9.3"
 	},
 	"devDependencies": {
 		"@types/node": "^22.10.0",
-		"@worken/context-core": "workspace:*",
 		"@worken/tsconfig": "workspace:*",
-		"tsx": "^4.19.2",
-		"typescript": "^5.9.3"
+		"tsx": "^4.19.2"
 	}
 }

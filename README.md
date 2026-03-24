@@ -22,6 +22,7 @@ Flow: **manifests / sources → graphs → context bundles → MCP**.
 | `@worken/testkit` | Graph fixtures and bundle assertions |
 | `@worken/platform-mcp` | Read-only MCP server: resources (`worken://…`), tools (`get_node`, `bundle_for_task`, …), prompts |
 | `@worken/repo-mcp` | **Scan this monorepo** (`package.json` in `apps/` and `packages/`) and feed the result into `@worken/platform-mcp` — no toy dataset |
+| `@worken/code-graph` | TypeScript Compiler API → **code IR** (exports, `depends-on`, symbols); optional merge into MCP via `WORKEN_MCP_CODE_GRAPH=1` |
 
 See `docs/adrs/0002-headless-kernel.md` and `docs/spec/semantic-protocol.md` for protocol details.
 
@@ -168,6 +169,8 @@ Useful root scripts:
 | `bun run check-types` | Typecheck workspaces |
 | `bun run lint` | Lint (Biome) |
 | `bun run mcp` | MCP server: **live repo scan** → model context (stdio) |
+| `bun run mcp:code` | Same + **TypeScript code graph** merged into platform graph |
+| `bun run code-graph` | Print code-graph JSON (optional `WORKEN_CODE_GRAPH_PACKAGES=…`) |
 
 ## Contributing
 

@@ -10,7 +10,9 @@
     "check-types": "turbo check-types",
     "test": "turbo test",
     "clean": "turbo clean",
-    "mcp": "bun ./packages/repo-mcp/src/mcp-stdio.ts"
+    "mcp": "bun ./packages/repo-mcp/src/mcp-stdio.ts",
+    "mcp:code": "WORKEN_MCP_CODE_GRAPH=1 bun ./packages/repo-mcp/src/mcp-stdio.ts",
+    "code-graph": "bun ./packages/code-graph/src/cli.ts"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.4.8",

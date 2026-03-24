@@ -68,6 +68,19 @@
         "typescript": "^5.9.3",
       },
     },
+    "packages/code-graph": {
+      "name": "@worken/code-graph",
+      "version": "0.0.1",
+      "dependencies": {
+        "@worken/platform-core": "workspace:*",
+        "typescript": "^5.9.3",
+      },
+      "devDependencies": {
+        "@types/node": "^22.10.0",
+        "@worken/tsconfig": "workspace:*",
+        "tsx": "^4.19.2",
+      },
+    },
     "packages/context-core": {
       "name": "@worken/context-core",
       "version": "0.0.1",
@@ -124,6 +137,7 @@
       "name": "@worken/repo-mcp",
       "version": "0.0.1",
       "dependencies": {
+        "@worken/code-graph": "workspace:*",
         "@worken/platform-core": "workspace:*",
         "@worken/platform-mcp": "workspace:*",
         "@worken/semantic-core": "workspace:*",
@@ -702,6 +716,8 @@
     "@vercel/oidc": ["@vercel/oidc@3.2.0", "", {}, "sha512-UycprH3T6n3jH0k44NHMa7pnFHGu/N05MjojYr+Mc6I7obkoLIJujSWwin1pCvdy/eOxrI/l3uDLQsmcrOb4ug=="],
 
     "@vercel/queue": ["@vercel/queue@0.1.4", "", { "dependencies": { "@vercel/oidc": "^3.0.5", "minimatch": "^10.2.4", "mixpart": "0.0.5", "picocolors": "^1.1.1" } }, "sha512-wo+jCycmCX078vQSbkX+RcLvySONDCK0f9aQp5UMKQD1+B+xKt3YVbIYbZukvoHQpbm5nnk6If+ADSeK/PmCgQ=="],
+
+    "@worken/code-graph": ["@worken/code-graph@workspace:packages/code-graph"],
 
     "@worken/context-core": ["@worken/context-core@workspace:packages/context-core"],
 

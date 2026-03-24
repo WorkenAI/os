@@ -6,6 +6,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import { buildCodeGraph, codeGraphToPlatformSource } from "@worken/code-graph";
 import { compilePlatform, mergePlatformSources } from "@worken/platform-core";
 import { createPlatformMcpServer } from "@worken/platform-mcp";
 import { compileSemantic, mergeSemanticSources } from "@worken/semantic-core";
@@ -63,12 +64,26 @@ function resolveRepoRoot(): string {
 
 const repoRoot = resolveRepoRoot();
 const pkgs = await loadWorkspacePackages(repoRoot);
-const platform = compilePlatform(
-	mergePlatformSources(
-		buildPlatformSourceFromWorkspace(pkgs),
-		buildRepoManifestSource(repoRoot),
-	),
-);
+const platformPieces = [
+	buildPlatformSourceFromWorkspace(pkgs),
+	buildRepoManifestSource(repoRoot),
+];
+if (process.env.WORKEN_MCP_CODE_GRAPH === "1") {
+	const pkgsFilter = process.env.WORKEN_CODE_GRAPH_PACKAGES;
+	const codeGraph = buildCodeGraph(
+		repoRoot,
+		pkgsFilter
+			? {
+					includePackages: pkgsFilter
+						.split(",")
+						.map((s) => s.trim())
+						.filter(Boolean),
+				}
+			: {},
+	);
+	platformPieces.push(codeGraphToPlatformSource(codeGraph));
+}
+const platform = compilePlatform(mergePlatformSources(...platformPieces));
 const semantic = compileSemantic(
 	mergeSemanticSources(
 		buildSemanticSourceForRepo(),
