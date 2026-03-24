@@ -13,6 +13,9 @@
     "check-types": "bunx --bun tsc --noEmit"
   },
   "dependencies": {
+    "@worken/ir": "workspace:*",
+    "@worken/shell-web": "workspace:*",
+    "@worken/demo": "workspace:*",
     "@json-render/core": "^0.13.0",
     "@json-render/react": "^0.13.0",
     "@radix-ui/react-avatar": "^1.1.11",

@@ -1,9 +1,10 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useMachine } from '@xstate/react'
+import { useCallback, useEffect, useMemo, useRef } from 'react'
 import type { LandingMotionPreset, LandingSceneDomainId, LandingSceneLayerId } from './types'
+import { landingWorkenOsMachine } from './landing-worken-os-machine'
 import { getLandingMotionTimings } from './window-settings'
 
 type ShellState = 'open' | 'closed' | 'fullscreen'
-type DockLayerTransitionState = 'idle' | 'switching'
 
 type LandingDomainDescriptor = {
   id: LandingSceneDomainId
@@ -72,87 +73,83 @@ export function useWorkenOS({ fallbackDomain, visibleDomains, onShellFocus }: Us
   )
   const visibleDomainIdSet = useMemo(() => new Set(visibleDomainIds), [visibleDomainIds])
   const motionTimings = useMemo(() => getLandingMotionTimings(), [])
-  const [activeLayerId, setActiveLayerId] = useState<LandingSceneLayerId>(() =>
-    getDomainLayerId(fallbackDomain, domainLayerById),
-  )
-  const [activeDomain, setActiveDomain] = useState<LandingSceneDomainId>(fallbackDomain)
-  const [shellState, setShellState] = useState<ShellState>('open')
-  const [motionPreset, setMotionPreset] = useState<LandingMotionPreset>('shell-open')
-  const [dockLayerTransitionState, setDockLayerTransitionState] =
-    useState<DockLayerTransitionState>('idle')
+  const [snapshot, send] = useMachine(landingWorkenOsMachine)
+
+  const activeDomain = snapshot.context.activeDomainId
+  const activeLayerId = snapshot.context.activeLayerId
+  const shellState = snapshot.context.shellState
+  const motionPreset = snapshot.context.motionPreset
+  const dockLayerTransitionState = snapshot.context.dockLayerTransitionState
+  const lastActiveDomainByLayerRef = useRef(snapshot.context.lastActiveDomainByLayer)
+
+  lastActiveDomainByLayerRef.current = snapshot.context.lastActiveDomainByLayer
+
   const { clearTimers, resetDockLayerTimeoutRef, resetWindowPresetTimeoutRef } = useStableTimers()
-  const lastActiveDomainByLayerRef = useRef<
-    Record<LandingSceneLayerId, LandingSceneDomainId | null>
-  >({
-    roles: null,
-    business: null,
-  })
 
   useEffect(() => {
     if (!visibleDomainIdSet.has(activeDomain)) {
-      setActiveDomain(fallbackDomain)
-      setActiveLayerId(getDomainLayerId(fallbackDomain, domainLayerById))
+      const layerId = getDomainLayerId(fallbackDomain, domainLayerById)
+      send({
+        type: 'visibleDomains.sync',
+        fallbackDomain,
+        layerId,
+      })
     }
-  }, [activeDomain, domainLayerById, fallbackDomain, visibleDomainIdSet])
+  }, [activeDomain, domainLayerById, fallbackDomain, send, visibleDomainIdSet])
 
   useEffect(() => {
     const resolvedLayerId = getDomainLayerId(activeDomain, domainLayerById)
-    setActiveLayerId((currentLayerId) =>
-      currentLayerId === resolvedLayerId ? currentLayerId : resolvedLayerId,
-    )
-    lastActiveDomainByLayerRef.current[resolvedLayerId] = activeDomain
-  }, [activeDomain, domainLayerById])
+    send({
+      type: 'lastActive.remember',
+      layerId: resolvedLayerId,
+      domainId: activeDomain,
+    })
+  }, [activeDomain, domainLayerById, send])
 
   const closeShell = useCallback(() => {
     clearTimers()
-    setShellState('closed')
-    setMotionPreset('shell-closed')
-  }, [clearTimers])
+    send({ type: 'shell.set', shellState: 'closed', motionPreset: 'shell-closed' })
+  }, [clearTimers, send])
 
   const openShell = useCallback(() => {
     clearTimers()
-    setShellState('open')
-    setMotionPreset('shell-open')
+    send({ type: 'shell.set', shellState: 'open', motionPreset: 'shell-open' })
     onShellFocus?.()
-  }, [clearTimers, onShellFocus])
+  }, [clearTimers, onShellFocus, send])
 
   const enterFullscreen = useCallback(() => {
     clearTimers()
-    setShellState('fullscreen')
-    setMotionPreset('shell-open')
+    send({ type: 'shell.set', shellState: 'fullscreen', motionPreset: 'shell-open' })
     onShellFocus?.()
-  }, [clearTimers, onShellFocus])
+  }, [clearTimers, onShellFocus, send])
 
   const exitFullscreen = useCallback(() => {
     clearTimers()
-    setShellState('open')
-    setMotionPreset('shell-open')
+    send({ type: 'shell.set', shellState: 'open', motionPreset: 'shell-open' })
     onShellFocus?.()
-  }, [clearTimers, onShellFocus])
+  }, [clearTimers, onShellFocus, send])
 
   const selectDomain = useCallback(
     (domainId: LandingSceneDomainId) => {
       if (!visibleDomainIdSet.has(domainId)) return
 
       const nextLayerId = getDomainLayerId(domainId, domainLayerById)
+      send({ type: 'domain.apply', domainId, activeLayerId: nextLayerId })
       if (nextLayerId !== activeLayerId) {
-        setActiveLayerId(nextLayerId)
-        setDockLayerTransitionState('switching')
+        send({ type: 'dock.transition', state: 'switching' })
         resetDockLayerTimeoutRef.current = setTimeout(() => {
-          setDockLayerTransitionState('idle')
+          send({ type: 'dock.transition', state: 'idle' })
         }, motionTimings.reopenSettleDelayMs)
       }
-      lastActiveDomainByLayerRef.current[nextLayerId] = domainId
-      setActiveDomain(domainId)
+      send({ type: 'lastActive.remember', layerId: nextLayerId, domainId })
 
       if (shellState === 'closed') {
         clearTimers()
-        setMotionPreset('shell-reopening')
-        setShellState('open')
+        send({ type: 'shell.set', shellState: 'open', motionPreset: 'shell-reopening' })
         onShellFocus?.()
 
         resetWindowPresetTimeoutRef.current = setTimeout(() => {
-          setMotionPreset('shell-open')
+          send({ type: 'motion.set', motionPreset: 'shell-open' })
         }, motionTimings.reopenSettleDelayMs)
 
         return
@@ -161,13 +158,14 @@ export function useWorkenOS({ fallbackDomain, visibleDomains, onShellFocus }: Us
       onShellFocus?.()
     },
     [
+      activeLayerId,
       clearTimers,
       domainLayerById,
-      activeLayerId,
+      motionTimings.reopenSettleDelayMs,
       onShellFocus,
-      motionTimings,
       resetDockLayerTimeoutRef,
       resetWindowPresetTimeoutRef,
+      send,
       shellState,
       visibleDomainIdSet,
     ],
@@ -188,21 +186,19 @@ export function useWorkenOS({ fallbackDomain, visibleDomains, onShellFocus }: Us
       if (!nextDomainId) return
 
       clearTimers()
-      setActiveLayerId(layerId)
-      setActiveDomain(nextDomainId)
-      setDockLayerTransitionState('switching')
+      send({ type: 'layer.apply', activeLayerId: layerId, domainId: nextDomainId })
+      send({ type: 'dock.transition', state: 'switching' })
       resetDockLayerTimeoutRef.current = setTimeout(() => {
-        setDockLayerTransitionState('idle')
+        send({ type: 'dock.transition', state: 'idle' })
       }, motionTimings.reopenSettleDelayMs)
-      lastActiveDomainByLayerRef.current[layerId] = nextDomainId
+      send({ type: 'lastActive.remember', layerId, domainId: nextDomainId })
 
       if (shellState === 'closed') {
-        setMotionPreset('shell-reopening')
-        setShellState('open')
+        send({ type: 'shell.set', shellState: 'open', motionPreset: 'shell-reopening' })
         onShellFocus?.()
 
         resetWindowPresetTimeoutRef.current = setTimeout(() => {
-          setMotionPreset('shell-open')
+          send({ type: 'motion.set', motionPreset: 'shell-open' })
         }, motionTimings.reopenSettleDelayMs)
 
         return
@@ -214,10 +210,11 @@ export function useWorkenOS({ fallbackDomain, visibleDomains, onShellFocus }: Us
       activeLayerId,
       clearTimers,
       domainLayerById,
-      motionTimings,
+      motionTimings.reopenSettleDelayMs,
       onShellFocus,
       resetDockLayerTimeoutRef,
       resetWindowPresetTimeoutRef,
+      send,
       shellState,
       visibleDomainIdSet,
       visibleDomains,
@@ -228,14 +225,14 @@ export function useWorkenOS({ fallbackDomain, visibleDomains, onShellFocus }: Us
     activeDomain,
     selectDomain,
     shell: {
-      state: shellState,
+      state: shellState as ShellState,
       close: closeShell,
       open: openShell,
       enterFullscreen,
       exitFullscreen,
     },
     motion: {
-      preset: motionPreset,
+      preset: motionPreset as LandingMotionPreset,
     },
     dock: {
       activeLayerId,

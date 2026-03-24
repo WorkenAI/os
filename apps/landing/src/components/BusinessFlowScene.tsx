@@ -1,8 +1,9 @@
-import { useLayoutEffect, useRef, useState } from 'react'
-import { DOMAIN_PRIMARY_COLORS } from '@/shell/domain-colors'
-import { shellUiTokens } from '@/shell/layout/ui-tokens'
-import { usePermissions } from '@/shell/permissions/context'
-import { useShellTheme } from '@/shell/theme'
+import { useMachine } from '@xstate/react'
+import { useLayoutEffect, useRef } from 'react'
+import { DOMAIN_PRIMARY_COLORS } from '@worken/shell-web/domain-colors'
+import { shellUiTokens } from '@worken/shell-web/layout/ui-tokens'
+import { usePermissions } from '@worken/shell-web/permissions/context'
+import { useShellTheme } from '@worken/shell-web/theme'
 import type {
   LandingDelivery,
   LandingDeliveryPhase,
@@ -11,6 +12,7 @@ import type {
   LandingSceneProps,
 } from '@/visualization/landing/types'
 import { getLandingSceneWindowStyle } from '@/visualization/landing/window-settings'
+import { businessFlowHoverMachine } from './business-flow-hover-machine'
 
 const FETCH_MS = 5_000
 const SPAWN_MS = 3_500
@@ -368,7 +370,8 @@ export default function BusinessFlowScene({
   const { theme } = useShellTheme()
   const { canAccessDomain } = usePermissions()
   const isLight = theme === 'light'
-  const [hoveredDomainId, setHoveredDomainId] = useState<SceneDomainId | null>(null)
+  const [hoverSnapshot, sendHover] = useMachine(businessFlowHoverMachine)
+  const hoveredDomainId = hoverSnapshot.context.hoveredDomainId as SceneDomainId | null
   const windowStyle = getLandingSceneWindowStyle(windowPreset)
   const currentLayerId: LandingSceneLayerId = activeLayerId ?? 'business'
   const isRoleLayerActive = currentLayerId === 'roles'
@@ -436,8 +439,8 @@ export default function BusinessFlowScene({
               disabled={!canAccessDomain(app.id)}
               onClick={() => onDomainSelect?.(app.id)}
               className={`pointer-events-auto absolute z-20 min-h-[92px] min-w-[170px] max-w-[260px] rounded-[24px] border px-4 py-4 text-left transition-all duration-300 ease-out hover:-translate-y-1 hover:scale-[1.03] ${app.position}`}
-              onMouseEnter={() => setHoveredDomainId(app.id)}
-              onMouseLeave={() => setHoveredDomainId(null)}
+              onMouseEnter={() => sendHover({ type: 'hover.enter', domainId: app.id })}
+              onMouseLeave={() => sendHover({ type: 'hover.leave' })}
               style={{
                 borderColor: activeDomainId === app.id ? `${app.accent}90` : `${app.accent}55`,
                 background: app.background,
@@ -526,8 +529,8 @@ export default function BusinessFlowScene({
                 disabled={!canAccessDomain(domain.id)}
                 onClick={() => onDomainSelect?.(domain.id)}
                 className={`pointer-events-auto absolute h-[104px] w-[180px] rounded-[26px] border p-5 text-left transition-all duration-300 ease-out hover:-translate-y-1 hover:scale-[1.03] ${domain.position}`}
-                onMouseEnter={() => setHoveredDomainId(domain.id)}
-                onMouseLeave={() => setHoveredDomainId(null)}
+                onMouseEnter={() => sendHover({ type: 'hover.enter', domainId: domain.id })}
+                onMouseLeave={() => sendHover({ type: 'hover.leave' })}
                 style={{
                   borderColor:
                     activeDomainId === domain.id ? `${domain.accent}90` : `${domain.accent}55`,

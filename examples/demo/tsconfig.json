@@ -1,0 +1,14 @@
+{
+  "extends": "../../packages/tsconfig/library.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "jsx": "react-jsx",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "paths": {
+      "@worken/landing/*": ["../../apps/landing/src/*"],
+      "@worken/shell-web/*": ["../../packages/shell/web/src/*"],
+      "@worken/demo/*": ["./*"]
+    }
+  },
+  "include": ["./**/*.ts", "./**/*.tsx"]
+}

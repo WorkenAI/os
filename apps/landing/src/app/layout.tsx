@@ -1,7 +1,7 @@
 import { GeistSans } from 'geist/font/sans'
 import type { Metadata, Viewport } from 'next'
 import './globals.css'
-import { PermissionsProvider } from '@/shell/permissions/context'
+import { PermissionsProvider } from '@worken/shell-web/permissions/context'
 
 export const metadata: Metadata = {
   title: 'Worken OS — the operating system for people and agents',

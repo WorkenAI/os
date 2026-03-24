@@ -1,6 +1,8 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
-import { DOMAIN_PRIMARY_COLORS } from '@/shell/domain-colors'
-import { SCENE_DOMAIN_ORDER, sceneDeliveryQueues } from '@/shell/runtime/mock-os-data'
+import { useMachine } from '@xstate/react'
+import { useCallback, useEffect, useRef } from 'react'
+import { DOMAIN_PRIMARY_COLORS } from '@worken/shell-web/domain-colors'
+import { SCENE_DOMAIN_ORDER, sceneDeliveryQueues } from '@worken/demo/mock-os-data'
+import { landingDeliveriesMachine } from './landing-deliveries-machine'
 import type { LandingDelivery, LandingDeliveryPhase, LandingSceneDomainId } from './types'
 
 type BusinessDomainId = (typeof SCENE_DOMAIN_ORDER)[number]
@@ -47,27 +49,16 @@ const DOMAIN_DELIVERY_CONFIG: ReadonlyArray<{
   },
 ]
 
-type DomainState = {
-  phase: LandingDeliveryPhase
-  cursor: number
-  animKey: number
-}
-
 function withJitter(baseDelayMs: number, jitterMs: number) {
   return baseDelayMs + Math.floor(Math.random() * (jitterMs + 1))
 }
 
-function createInitialStates(): Record<BusinessDomainId, DomainState> {
-  return {
-    hr: { phase: 'idle', cursor: 0, animKey: 0 },
-    sales: { phase: 'idle', cursor: 0, animKey: 0 },
-    marketing: { phase: 'idle', cursor: 0, animKey: 0 },
-    finance: { phase: 'idle', cursor: 0, animKey: 0 },
-  }
-}
-
 export function useLandingDeliveries() {
-  const [states, setStates] = useState(createInitialStates)
+  const [snapshot, send] = useMachine(landingDeliveriesMachine)
+  const states = snapshot.context.states
+  const statesRef = useRef(states)
+  statesRef.current = states
+
   const timersRef = useRef(new Set<ReturnType<typeof setTimeout>>())
   const mountedRef = useRef(true)
 
@@ -84,10 +75,7 @@ export function useLandingDeliveries() {
     for (const config of DOMAIN_DELIVERY_CONFIG) {
       schedule(
         () => {
-          setStates((prev) => ({
-            ...prev,
-            [config.domainId]: { ...prev[config.domainId], phase: 'fetching' as const },
-          }))
+          send({ type: 'domain.fetching', domainId: config.domainId })
         },
         withJitter(config.initialDelayMs, INITIAL_SPAWN_JITTER_MS),
       )
@@ -97,7 +85,7 @@ export function useLandingDeliveries() {
       for (const id of timersRef.current) clearTimeout(id)
       timersRef.current.clear()
     }
-  }, [schedule])
+  }, [schedule, send])
 
   const handlePhaseEnd = useCallback(
     (domainId: LandingSceneDomainId, completedPhase: LandingDeliveryPhase) => {
@@ -106,41 +94,34 @@ export function useLandingDeliveries() {
       if (!queue) return
 
       if (completedPhase === 'fetching') {
-        setStates((prev) => {
-          if (prev[id].phase !== 'fetching') return prev
-          return { ...prev, [id]: { ...prev[id], phase: 'delivering' as const } }
-        })
+        if (statesRef.current[id].phase !== 'fetching') return
+        send({ type: 'domain.delivering', domainId: id })
       }
 
       if (completedPhase === 'delivering') {
-        setStates((prev) => {
-          if (prev[id].phase !== 'delivering') return prev
-          return { ...prev, [id]: { ...prev[id], phase: 'scored' as const } }
-        })
+        if (statesRef.current[id].phase !== 'delivering') return
+        send({ type: 'domain.scored', domainId: id })
 
         schedule(() => {
-          setStates((prev) => {
-            const current = prev[id]
-            const nextCursor = (current.cursor + 1) % queue.length
-            return {
-              ...prev,
-              [id]: { phase: 'idle' as const, cursor: nextCursor, animKey: current.animKey + 1 },
-            }
+          const current = statesRef.current[id]
+          const nextCursor = (current.cursor + 1) % queue.length
+          send({
+            type: 'domain.resetCursor',
+            domainId: id,
+            nextCursor,
+            nextAnimKey: current.animKey + 1,
           })
 
           schedule(
             () => {
-              setStates((prev) => ({
-                ...prev,
-                [id]: { ...prev[id], phase: 'fetching' as const },
-              }))
+              send({ type: 'domain.fetching', domainId: id })
             },
             withJitter(IDLE_MS, REPEAT_SPAWN_JITTER_MS),
           )
         }, SCORE_MS)
       }
     },
-    [schedule],
+    [schedule, send],
   )
 
   const deliveries: LandingDelivery[] = DOMAIN_DELIVERY_CONFIG.map((config) => {

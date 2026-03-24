@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
-import { ShellMachineProvider } from '@/shell/machines/context'
-import { ShellThemeProvider } from '@/shell/theme'
+import { ShellMachineProvider } from '@worken/shell-web/machines/context'
+import { ShellThemeProvider } from '@worken/shell-web/theme'
 
 export default function ShellLayout({ children }: { children: ReactNode }) {
   return (

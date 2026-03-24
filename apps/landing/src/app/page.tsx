@@ -1,28 +1,31 @@
 'use client'
 
+import { useMachine } from '@xstate/react'
 import type { CSSProperties } from 'react'
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef } from 'react'
 import Hero from '@/components/Hero'
 import { ShellPreview } from '@/components/ShellPreview'
-import { getShellSurfaceLayoutId } from '@/domains/manifest'
-import { DOMAIN_MANIFESTS } from '@/domains/registry'
-import type { DomainShellSurfaceLayoutId } from '@/domains/types'
+import { getShellSurfaceLayoutId } from '@worken/ir/domains/manifest'
+import { DOMAIN_MANIFESTS } from '@worken/ir/domains/registry'
+import type { DomainShellSurfaceLayoutId } from '@worken/ir/domains/types'
 import { useMouseTilt } from '@/hooks/MouseTilt'
 import { cn } from '@/lib/utils'
-import { withHexAlpha } from '@/shell/domain-colors'
-import { RoleIcon } from '@/shell/icons/role-icon'
-import { shellUiTokens } from '@/shell/layout/ui-tokens'
-import { usePermissions } from '@/shell/permissions/context'
-import { useWorkenMockRuntime, WorkenMockRuntimeProvider } from '@/shell/runtime/mock-os-runtime'
-import { openShellInspector } from '@/shell/session/dispatch'
-import { ShellThemeProvider, useShellTheme } from '@/shell/theme'
+import { withHexAlpha } from '@worken/shell-web/domain-colors'
+import { RoleIcon } from '@worken/shell-web/icons/role-icon'
+import { shellUiTokens } from '@worken/shell-web/layout/ui-tokens'
+import { usePermissions } from '@worken/shell-web/permissions/context'
+import { useWorkenMockRuntime, WorkenMockRuntimeProvider } from '@worken/demo/mock-os-runtime'
+import { openShellInspector } from '@worken/shell-web/session/dispatch'
+import { ShellThemeProvider, useShellTheme } from '@worken/shell-web/theme'
 import { getLandingScene } from '@/visualization/landing/registry'
 import type { LandingSceneDomainId, LandingSceneLayerId } from '@/visualization/landing/types'
 import { useLandingDeliveries } from '@/visualization/landing/use-deliveries'
 import { useWorkenOS } from '@/visualization/landing/use-worken-os'
 import { getLandingShellPreviewStyle } from '@/visualization/landing/window-settings'
+import { landingPageMachine } from './landing-page-machine'
 
 const ROLE_LAYER_LAYOUT_IDS = new Set<DomainShellSurfaceLayoutId>([
+  'spaces',
   'role-manager',
   'developer-studio',
 ])
@@ -63,15 +66,9 @@ function HomeContent() {
   const layerSwitchRef = useRef<HTMLDivElement | null>(null)
   const businessLayerButtonRef = useRef<HTMLButtonElement | null>(null)
   const rolesLayerButtonRef = useRef<HTMLButtonElement | null>(null)
-  const [layerIndicatorStyle, setLayerIndicatorStyle] = useState<{
-    width: number
-    offset: number
-  } | null>(null)
-  const [pendingInspectorTarget, setPendingInspectorTarget] = useState<{
-    domainId: LandingSceneDomainId
-    entityType: string
-    entityId: string
-  } | null>(null)
+  const [pageSnapshot, sendPage] = useMachine(landingPageMachine)
+  const layerIndicatorStyle = pageSnapshot.context.layerIndicatorStyle
+  const pendingInspectorTarget = pageSnapshot.context.pendingInspectorTarget
   const canSelectDomain = (domainId: DomainId) => canAccessDomain(domainId)
   const accessibleDomains = useMemo(
     () => LANDING_DOMAINS.filter((domain) => canSelectDomain(domain.id)),
@@ -92,8 +89,9 @@ function HomeContent() {
 
       if (Object.values(permissions.verbs).some(Boolean)) return true
 
-      return Object.values(permissions.entities).some((entityPermissions) =>
-        Object.values(entityPermissions.actions).some(Boolean),
+      return Object.values(permissions.entities).some(
+        (entityPermissions: { actions: Record<string, boolean> }) =>
+          Object.values(entityPermissions.actions).some(Boolean),
       )
     })
 
@@ -119,17 +117,18 @@ function HomeContent() {
       if (!canSelectDomain(target.domainId)) return
 
       if (activeDomain !== target.domainId) {
-        setPendingInspectorTarget(target)
+        sendPage({ type: 'inspector.pending.set', target })
         selectDomain(target.domainId)
         return
       }
 
       openShellInspector({ entityType: target.entityType, id: target.entityId })
     },
-    [activeDomain, canSelectDomain, selectDomain],
+    [activeDomain, canSelectDomain, selectDomain, sendPage],
   )
   const activeDomainAccentColor =
     LANDING_DOMAINS.find((domain) => domain.id === activeDomain)?.color ?? LANDING_DOMAINS[0]!.color
+  const shellInitialViewId = activeDomain === 'admin' ? 'spaces' : null
   const shellPreviewStyle = getLandingShellPreviewStyle(motion.preset)
   const isShellFullscreen = shell.state === 'fullscreen'
   const syncLayerIndicator = useCallback(() => {
@@ -141,11 +140,14 @@ function HomeContent() {
     if (!layerSwitch || !activeButton) return
     const switchRect = layerSwitch.getBoundingClientRect()
     const buttonRect = activeButton.getBoundingClientRect()
-    setLayerIndicatorStyle({
-      width: buttonRect.width,
-      offset: buttonRect.left - switchRect.left,
+    sendPage({
+      type: 'layerIndicator.set',
+      style: {
+        width: buttonRect.width,
+        offset: buttonRect.left - switchRect.left,
+      },
     })
-  }, [dock.activeLayerId])
+  }, [dock.activeLayerId, sendPage])
 
   useLayoutEffect(() => {
     syncLayerIndicator()
@@ -169,13 +171,13 @@ function HomeContent() {
         entityType: pendingInspectorTarget.entityType,
         id: pendingInspectorTarget.entityId,
       })
-      setPendingInspectorTarget(null)
+      sendPage({ type: 'inspector.pending.set', target: null })
     }, 80)
 
     return () => {
       window.clearTimeout(openInspectorTimeout)
     }
-  }, [activeDomain, pendingInspectorTarget])
+  }, [activeDomain, pendingInspectorTarget, sendPage])
 
   return (
     <main
@@ -333,7 +335,7 @@ function HomeContent() {
                     : 'text-zinc-500 hover:text-zinc-300',
                 )}
               >
-                Business
+                Work
               </button>
               <button
                 ref={rolesLayerButtonRef}
@@ -346,7 +348,7 @@ function HomeContent() {
                     : 'text-zinc-500 hover:text-zinc-300',
                 )}
               >
-                Dev
+                Spaces
               </button>
             </div>
           </div>
@@ -404,6 +406,7 @@ function HomeContent() {
             <ShellPreview
               key={activeDomain}
               domainId={activeDomain}
+              initialViewId={shellInitialViewId}
               showChrome
               theme={theme}
               onToggleTheme={toggle}

@@ -2,16 +2,17 @@
 
 import type { CSSProperties } from 'react'
 import { useEffect, useRef } from 'react'
-import { hexToRgbCsv, resolveDomainPrimaryColor } from '@/shell/domain-colors'
-import { ShellWindowControls } from '@/shell/layout/shell-window-controls'
-import { ShellMachineProvider } from '@/shell/machines/context'
-import { ShellScreen } from '@/shell/runtime/screen/shell-screen'
-import { ShellSessionProvider, useShellSession } from '@/shell/session/context'
-import { type ShellTheme, ShellThemeProvider } from '@/shell/theme'
-import { WorkenOsWebMcpRegistrar } from '@/shell/webmcp/registrar'
+import { hexToRgbCsv, resolveDomainPrimaryColor } from '@worken/shell-web/domain-colors'
+import { ShellWindowControls } from '@worken/shell-web/layout/shell-window-controls'
+import { ShellMachineProvider } from '@worken/shell-web/machines/context'
+import { ShellScreen } from '@worken/shell-web/runtime/screen/shell-screen'
+import { ShellSessionProvider, useShellSession } from '@worken/shell-web/session/context'
+import { type ShellTheme, ShellThemeProvider } from '@worken/shell-web/theme'
+import { WorkenOsWebMcpRegistrar } from '@worken/shell-web/webmcp/registrar'
 
 export function ShellPreview({
   domainId,
+  initialViewId,
   showChrome,
   theme,
   onToggleTheme,
@@ -20,6 +21,8 @@ export function ShellPreview({
   isFullscreen = false,
 }: {
   domainId: string
+  /** Opens this view on first load when permitted (e.g. admin → spaces). */
+  initialViewId?: string | null
   showChrome?: boolean
   theme?: ShellTheme
   onToggleTheme?: () => void
@@ -29,11 +32,12 @@ export function ShellPreview({
 }) {
   return (
     <ShellMachineProvider>
-      <ShellSessionProvider key={domainId}>
+      <ShellSessionProvider key={domainId} initialViewId={initialViewId}>
         <WorkenOsWebMcpRegistrar />
         <ShellThemeProvider theme={theme} toggle={onToggleTheme}>
           <ShellPreviewFrame
             domainId={domainId}
+            initialViewId={initialViewId}
             showChrome={showChrome}
             onRequestHide={onRequestHide}
             onToggleFullscreen={onToggleFullscreen}
@@ -47,12 +51,14 @@ export function ShellPreview({
 
 function ShellPreviewFrame({
   domainId,
+  initialViewId,
   showChrome,
   onRequestHide,
   onToggleFullscreen,
   isFullscreen,
 }: {
   domainId: string
+  initialViewId?: string | null
   showChrome?: boolean
   onRequestHide?: () => void
   onToggleFullscreen?: () => void
@@ -72,6 +78,7 @@ function ShellPreviewFrame({
     >
       <ShellScreenWithPreviewChrome
         domainId={domainId}
+        initialViewId={initialViewId}
         showChrome={showChrome}
         onRequestHide={onRequestHide}
         onToggleFullscreen={onToggleFullscreen}
@@ -83,12 +90,14 @@ function ShellPreviewFrame({
 
 function ShellScreenWithPreviewChrome({
   domainId,
+  initialViewId,
   showChrome,
   onRequestHide,
   onToggleFullscreen,
   isFullscreen,
 }: {
   domainId: string
+  initialViewId?: string | null
   showChrome?: boolean
   onRequestHide?: () => void
   onToggleFullscreen?: () => void
@@ -111,8 +120,8 @@ function ShellScreenWithPreviewChrome({
   }, [activateDomain])
 
   useEffect(() => {
-    void activateDomainRef.current(domainId)
-  }, [domainId])
+    void activateDomainRef.current(domainId, { initialViewId: initialViewId ?? undefined })
+  }, [domainId, initialViewId])
 
   if (status === 'error') {
     return (

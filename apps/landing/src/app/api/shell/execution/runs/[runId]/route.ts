@@ -1,14 +1,14 @@
 import { cookies, headers } from 'next/headers'
 import { NextResponse } from 'next/server'
 import { readExecutionResponse } from '@/execution/service'
-import { ACTIVE_ROLE_COOKIE, SHELL_SESSION_COOKIE } from '@/shell/permissions/shared'
+import { ACTIVE_ROLE_COOKIE, SHELL_SESSION_COOKIE } from '@worken/shell-web/permissions/shared'
 import {
   getActiveRoleIdFromCookie,
   getShellSessionIdFromCookie,
   setActiveRoleCookie,
   setShellSessionCookie,
-} from '@/shell/server/auth/session'
-import { resolveShellSession } from '@/shell/server/session/service'
+} from '@worken/shell-web/server/auth/session'
+import { resolveShellSession } from '@worken/shell-web/server/session/service'
 
 function createJsonError(message: string, status = 400) {
   return NextResponse.json({ error: message }, { status })

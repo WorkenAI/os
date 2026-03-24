@@ -1,7 +1,7 @@
 import { cookies } from 'next/headers'
 import type { NextRequest } from 'next/server'
-import { getDomainViewExecution } from '@/domains/manifest'
-import { loadDomain } from '@/domains/registry'
+import { getDomainViewExecution } from '@worken/ir/domains/manifest'
+import { loadDomain } from '@worken/ir/domains/registry'
 import {
   applyExecutionVerb,
   ensureExecutionRun,
@@ -12,12 +12,12 @@ import {
   ACTIVE_ROLE_COOKIE,
   SHELL_SESSION_COOKIE,
   toPermissionSnapshot,
-} from '@/shell/permissions/shared'
-import { getActiveRoleIdFromCookie, getShellSessionIdFromCookie } from '@/shell/server/auth/session'
-import { buildShellStreamResponse } from '@/shell/server/orchestrator'
-import { resolveShellSession } from '@/shell/server/session/service'
-import { createShellStream } from '@/shell/server/stream'
-import { toReasoningEnvelope } from '@/shell/session/message-format'
+} from '@worken/shell-web/permissions/shared'
+import { getActiveRoleIdFromCookie, getShellSessionIdFromCookie } from '@worken/shell-web/server/auth/session'
+import { buildShellStreamResponse } from '@worken/shell-web/server/orchestrator'
+import { resolveShellSession } from '@worken/shell-web/server/session/service'
+import { createShellStream } from '@worken/shell-web/server/stream'
+import { toReasoningEnvelope } from '@worken/shell-web/session/message-format'
 
 export const dynamic = 'force-dynamic'
 export const maxDuration = 300

@@ -21,6 +21,9 @@
         "@radix-ui/react-slot": "^1.2.4",
         "@radix-ui/react-tooltip": "^1.2.8",
         "@tanstack/react-query": "^5.90.21",
+        "@worken/demo": "workspace:*",
+        "@worken/ir": "workspace:*",
+        "@worken/shell-web": "workspace:*",
         "@workflow/core": "^4.2.0-beta.71",
         "@workflow/next": "^4.0.1-beta.67",
         "@workflow/world-postgres": "^4.1.0-beta.45",
@@ -51,17 +54,62 @@
         "typescript": "^5.9.3",
       },
     },
+    "examples/demo": {
+      "name": "@worken/demo",
+      "version": "0.0.1",
+      "dependencies": {
+        "@worken/ir": "workspace:*",
+        "@worken/shell-web": "workspace:*",
+        "@xstate/react": "^6.1.0",
+        "xstate": "^5.28.0",
+      },
+      "devDependencies": {
+        "@types/react": "^19.2.9",
+        "@types/react-dom": "^19.2.3",
+      },
+      "peerDependencies": {
+        "react": "^19.2.4",
+      },
+    },
+    "packages/ir": {
+      "name": "@worken/ir",
+      "version": "0.0.1",
+      "dependencies": {
+        "@json-render/core": "^0.13.0",
+        "zod": "^4.3.6",
+      },
+    },
+    "packages/shell/web": {
+      "name": "@worken/shell-web",
+      "version": "0.0.1",
+      "dependencies": {
+        "@worken/ir": "workspace:*",
+      },
+      "devDependencies": {
+        "@types/react": "^19.2.9",
+        "@types/react-dom": "^19.2.3",
+      },
+      "peerDependencies": {
+        "@json-render/core": "^0.13.0",
+        "@json-render/react": "^0.13.0",
+        "@radix-ui/react-avatar": "^1.1.11",
+        "@radix-ui/react-scroll-area": "^1.2.10",
+        "@radix-ui/react-separator": "^1.1.8",
+        "@xstate/react": "^6.1.0",
+        "class-variance-authority": "^0.7.1",
+        "clsx": "^2.1.1",
+        "lucide-react": "^0.577.0",
+        "next": "^16.1.6",
+        "react": "^19.2.4",
+        "react-dom": "^19.2.4",
+        "tailwind-merge": "^3.5.0",
+        "xstate": "^5.28.0",
+        "zod": "^4.3.6",
+      },
+    },
     "packages/tsconfig": {
       "name": "@worken/tsconfig",
       "version": "0.0.1",
-    },
-    "packages/utils": {
-      "name": "@worken/utils",
-      "version": "0.0.1",
-      "devDependencies": {
-        "@worken/tsconfig": "workspace:*",
-        "typescript": "^5.9.3",
-      },
     },
   },
   "packages": {
@@ -587,11 +635,15 @@
 
     "@vercel/queue": ["@vercel/queue@0.1.4", "", { "dependencies": { "@vercel/oidc": "^3.0.5", "minimatch": "^10.2.4", "mixpart": "0.0.5", "picocolors": "^1.1.1" } }, "sha512-wo+jCycmCX078vQSbkX+RcLvySONDCK0f9aQp5UMKQD1+B+xKt3YVbIYbZukvoHQpbm5nnk6If+ADSeK/PmCgQ=="],
 
+    "@worken/demo": ["@worken/demo@workspace:examples/demo"],
+
+    "@worken/ir": ["@worken/ir@workspace:packages/ir"],
+
     "@worken/landing": ["@worken/landing@workspace:apps/landing"],
 
-    "@worken/tsconfig": ["@worken/tsconfig@workspace:packages/tsconfig"],
+    "@worken/shell-web": ["@worken/shell-web@workspace:packages/shell/web"],
 
-    "@worken/utils": ["@worken/utils@workspace:packages/utils"],
+    "@worken/tsconfig": ["@worken/tsconfig@workspace:packages/tsconfig"],
 
     "@workflow/astro": ["@workflow/astro@4.0.0-beta.45", "", { "dependencies": { "@swc/core": "1.15.3", "@workflow/builders": "4.0.1-beta.62", "@workflow/rollup": "4.0.0-beta.28", "@workflow/swc-plugin": "4.1.0-beta.20", "@workflow/vite": "4.0.0-beta.21", "exsolve": "^1.0.8", "pathe": "^2.0.3" } }, "sha512-QRSXwhpjpu3JucO+iT2Bdkxm+3y1rmDWCYQ1RrgB7WXiZUlWobGo9dWxkew2pRw/MsBcO7jlGZjazVvCv3JhUQ=="],
 

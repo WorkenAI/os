@@ -3,7 +3,11 @@
   "compilerOptions": {
     "types": ["bun-types"],
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@worken/ir/*": ["../../packages/ir/src/*"],
+      "@worken/shell-web/*": ["../../packages/shell/web/src/*"],
+      "@worken/demo/*": ["../../examples/demo/*"],
+      "@worken/landing/*": ["./src/*"]
     }
   },
   "include": [

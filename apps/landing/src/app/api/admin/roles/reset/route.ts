@@ -1,14 +1,14 @@
 import { cookies, headers } from 'next/headers'
 import { NextResponse } from 'next/server'
-import { ACTIVE_ROLE_COOKIE, SHELL_SESSION_COOKIE } from '@/shell/permissions/shared'
+import { ACTIVE_ROLE_COOKIE, SHELL_SESSION_COOKIE } from '@worken/shell-web/permissions/shared'
 import {
   getActiveRoleIdFromCookie,
   getShellSessionIdFromCookie,
   setActiveRoleCookie,
   setShellSessionCookie,
-} from '@/shell/server/auth/session'
-import { resetRoleDefinitions } from '@/shell/server/policy/service'
-import { resolveShellSession, toShellSessionPayload } from '@/shell/server/session/service'
+} from '@worken/shell-web/server/auth/session'
+import { resetRoleDefinitions } from '@worken/shell-web/server/policy/service'
+import { resolveShellSession, toShellSessionPayload } from '@worken/shell-web/server/session/service'
 
 export const dynamic = 'force-dynamic'
 

@@ -1,5 +1,5 @@
 import type { ComponentType, CSSProperties } from 'react'
-import { DOMAIN_IDS } from '@/domains/registry'
+import { DOMAIN_IDS } from '@worken/ir/domains/registry'
 
 export type LandingSceneDomainId = (typeof DOMAIN_IDS)[number]
 export type LandingSceneLayerId = 'roles' | 'business'
