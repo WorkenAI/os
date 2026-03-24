@@ -1,11 +1,14 @@
 'use client'
 
+import type { SemanticIR } from '@worken/semantic-ir'
 import type { CSSProperties } from 'react'
 import { useEffect, useRef } from 'react'
+import baselineIr from '@/generated/semantic-ir-baseline.json'
 import { hexToRgbCsv, resolveDomainPrimaryColor } from '@/shell/domain-colors'
 import { ShellWindowControls } from '@/shell/layout/shell-window-controls'
 import { ShellMachineProvider } from '@/shell/machines/context'
 import { ShellScreen } from '@/shell/runtime/screen/shell-screen'
+import { SemanticIrProvider } from '@/shell/runtime/semantic/semantic-ir-context'
 import { ShellSessionProvider, useShellSession } from '@/shell/session/context'
 import { type ShellTheme, ShellThemeProvider } from '@/shell/theme'
 import { WorkenOsWebMcpRegistrar } from '@/shell/webmcp/registrar'
@@ -28,20 +31,22 @@ export function ShellPreview({
   isFullscreen?: boolean
 }) {
   return (
-    <ShellMachineProvider>
-      <ShellSessionProvider key={domainId}>
-        <WorkenOsWebMcpRegistrar />
-        <ShellThemeProvider theme={theme} toggle={onToggleTheme}>
-          <ShellPreviewFrame
-            domainId={domainId}
-            showChrome={showChrome}
-            onRequestHide={onRequestHide}
-            onToggleFullscreen={onToggleFullscreen}
-            isFullscreen={isFullscreen}
-          />
-        </ShellThemeProvider>
-      </ShellSessionProvider>
-    </ShellMachineProvider>
+    <SemanticIrProvider ir={baselineIr as SemanticIR}>
+      <ShellMachineProvider>
+        <ShellSessionProvider key={domainId}>
+          <WorkenOsWebMcpRegistrar />
+          <ShellThemeProvider theme={theme} toggle={onToggleTheme}>
+            <ShellPreviewFrame
+              domainId={domainId}
+              showChrome={showChrome}
+              onRequestHide={onRequestHide}
+              onToggleFullscreen={onToggleFullscreen}
+              isFullscreen={isFullscreen}
+            />
+          </ShellThemeProvider>
+        </ShellSessionProvider>
+      </ShellMachineProvider>
+    </SemanticIrProvider>
   )
 }
 

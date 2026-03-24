@@ -4,6 +4,8 @@ import type { ReactNode } from 'react'
 import { getConversationFooter, getShellSurfaceLayoutId } from '@/domains/manifest'
 import type { DomainDefinition } from '@/domains/types'
 import { ShellFrame } from '@/shell/layout/shell-frame'
+import { useSemanticIr } from '@/shell/runtime/semantic/semantic-ir-context'
+import { resolveShellLayoutFromDomainViewAndIr } from '@/shell/runtime/semantic/shell-surface-bridge'
 import { getShellSurfaceLayout } from './surface-registry'
 
 export function ShellScreen({
@@ -21,9 +23,12 @@ export function ShellScreen({
   onAction: (input: { verb: string; entityType?: string }) => void
   windowControls?: ReactNode
 }) {
+  const semanticIr = useSemanticIr()
   const resolvedActiveView = activeView ?? domain.surfaces.defaultViewId
   const conversationFooter = getConversationFooter(domain, resolvedActiveView)
-  const surfaceLayoutId = getShellSurfaceLayoutId(domain, resolvedActiveView)
+  const manifestLayoutId = getShellSurfaceLayoutId(domain, resolvedActiveView)
+  const irLayout = resolveShellLayoutFromDomainViewAndIr(semanticIr, domain, resolvedActiveView)
+  const surfaceLayoutId = irLayout ?? manifestLayoutId
   const surfaceLayout = getShellSurfaceLayout(surfaceLayoutId)
 
   const screen = (

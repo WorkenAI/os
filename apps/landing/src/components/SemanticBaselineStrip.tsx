@@ -1,9 +1,11 @@
 import { getSemanticIrBaseline } from '@/lib/semantic-ir-baseline'
+import { getWebShellSurfaces } from '@/shell/runtime/semantic/shell-surface-bridge'
 
 export function SemanticBaselineStrip() {
   const ir = getSemanticIrBaseline()
   const actionCount = Object.keys(ir.actions).length
   const surfaceCount = Object.keys(ir.surfaces).length
+  const webShellCount = getWebShellSurfaces(ir).length
   const snapshot = ir.schema.snapshotId.slice(0, 18)
 
   return (
@@ -18,7 +20,7 @@ export function SemanticBaselineStrip() {
         </span>
         <span>
           {actionCount} action{actionCount === 1 ? '' : 's'} · {surfaceCount} surface
-          {surfaceCount === 1 ? '' : 's'}
+          {surfaceCount === 1 ? '' : 's'} ({webShellCount} web-shell)
         </span>
       </div>
     </div>

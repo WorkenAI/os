@@ -2,11 +2,32 @@
   "schema": {
     "schemaVersion": "0.1.0",
     "workspaceId": "worken-os",
-    "snapshotId": "sha256:e443d2a7dec54ef65927e40c349401aa1712c68c6c91d7c0d19152e1e4524040",
-    "generatedAt": "2026-03-24T15:13:43.869Z",
+    "snapshotId": "sha256:f7681e375be8273dcbd87ea959d382b743239c8971fe25b02331bb09611ab509",
+    "generatedAt": "2026-03-24T15:29:39.814Z",
     "semanticProtocolVersion": "0.1.0"
   },
   "entities": {
+    "object.shell_session": {
+      "id": "object.shell_session",
+      "title": "Shell session",
+      "fields": {
+        "activeDomainId": {
+          "type": "string",
+          "required": true
+        },
+        "activeViewId": {
+          "type": "string",
+          "required": true
+        },
+        "layerId": {
+          "type": "enum",
+          "values": [
+            "business",
+            "roles"
+          ]
+        }
+      }
+    },
     "object.candidate": {
       "id": "object.candidate",
       "title": "Candidate",
@@ -32,6 +53,10 @@
     }
   },
   "roles": {
+    "role.shell_operator": {
+      "id": "role.shell_operator",
+      "title": "Shell operator"
+    },
     "role.hr_manager": {
       "id": "role.hr_manager",
       "title": "HR Manager"
@@ -42,6 +67,13 @@
     }
   },
   "actions": {
+    "action.shell.navigate": {
+      "id": "action.shell.navigate",
+      "title": "Navigate shell",
+      "domainId": "domain.worken.shell",
+      "objectId": "object.shell_session",
+      "objectType": "object.shell_session"
+    },
     "action.candidate.schedule_interview": {
       "id": "action.candidate.schedule_interview",
       "title": "Schedule interview",
@@ -71,6 +103,14 @@
     }
   },
   "policies": {
+    "policy.action.shell.navigate.default": {
+      "id": "policy.action.shell.navigate.default",
+      "actionId": "action.shell.navigate",
+      "effect": "allow",
+      "subjects": [
+        "role.shell_operator"
+      ]
+    },
     "policy.action.candidate.schedule_interview.default": {
       "id": "policy.action.candidate.schedule_interview.default",
       "actionId": "action.candidate.schedule_interview",
@@ -102,10 +142,92 @@
     }
   },
   "surfaces": {
+    "surface.shell.web.default": {
+      "id": "surface.shell.web.default",
+      "title": "Default shell (sidebar + conversation + inspector)",
+      "entity": "shell_session",
+      "projectionTarget": "web-shell",
+      "shellLayoutId": "default",
+      "regions": {
+        "sidebar": [
+          "shell.nav",
+          "shell.actions"
+        ],
+        "conversation": [
+          "shell.chat"
+        ],
+        "inspector": [
+          "shell.selection"
+        ]
+      },
+      "actionBindings": [
+        "action.shell.navigate"
+      ]
+    },
+    "surface.shell.chat.primary": {
+      "id": "surface.shell.chat.primary",
+      "title": "Chat shell",
+      "entity": "shell_session",
+      "projectionTarget": "chat-shell",
+      "regions": {
+        "thread": [
+          "shell.messages"
+        ],
+        "composer": [
+          "shell.input"
+        ]
+      },
+      "actionBindings": [
+        "action.shell.navigate"
+      ]
+    },
+    "surface.shell.voice.primary": {
+      "id": "surface.shell.voice.primary",
+      "title": "Voice shell",
+      "entity": "shell_session",
+      "projectionTarget": "voice-shell",
+      "actionBindings": [
+        "action.shell.navigate"
+      ]
+    },
+    "surface.candidate.web.pipeline": {
+      "id": "surface.candidate.web.pipeline",
+      "title": "Candidate pipeline",
+      "entity": "candidate",
+      "projectionTarget": "web-shell",
+      "shellLayoutId": "default",
+      "regions": {
+        "header": [
+          "candidate.name",
+          "candidate.status"
+        ],
+        "main": [
+          "candidate.pipeline"
+        ]
+      },
+      "actionBindings": [
+        "action.candidate.schedule_interview"
+      ]
+    },
+    "surface.candidate.chat.followup": {
+      "id": "surface.candidate.chat.followup",
+      "title": "Candidate follow-up",
+      "entity": "candidate",
+      "projectionTarget": "chat-shell",
+      "regions": {
+        "suggestions": [
+          "next.actions"
+        ]
+      },
+      "actionBindings": [
+        "action.candidate.schedule_interview"
+      ]
+    },
     "surface.candidate.detail": {
       "id": "surface.candidate.detail",
       "title": "Candidate detail",
       "entity": "candidate",
+      "projectionTarget": "model-context",
       "regions": {
         "header": [
           "candidate.name",

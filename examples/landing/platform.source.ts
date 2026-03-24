@@ -28,9 +28,17 @@ export const landingPlatformSource: PlatformSource = {
 			kind: "contract",
 			title: "Semantic IR baseline artifact",
 			summary:
-				"Deterministic Stage-1 IR snapshot generated from examples/landing DSL at build time.",
+				"Stage-1 IR from Semantic Protocol graph: entities, roles, actions, policies, surfaces (web/chat/voice/model-context), bindings. Fed to Web Shell via shell-surface-bridge.",
 			inputs: ["examples/landing/semantic.source.ts"],
 			outputs: ["apps/landing/src/generated/semantic-ir-baseline.json"],
+		},
+		{
+			id: "contract.shell-surface-bridge",
+			kind: "contract",
+			title: "Shell surface bridge",
+			summary:
+				"Maps Semantic IR web-shell surfaces (shellLayoutId) to the shell layout registry so projections can drive Surfaces of Shell.",
+			inputs: ["apps/landing/src/shell/runtime/semantic/shell-surface-bridge.ts"],
 		},
 		{
 			id: "example.landing-dsl-slice",
@@ -51,6 +59,12 @@ export const landingPlatformSource: PlatformSource = {
 			kind: "implements",
 			from: "package.worken-landing-app",
 			to: "contract.semantic-ir-baseline",
+		},
+		{
+			id: "rel.landing.app-implements-bridge",
+			kind: "implements",
+			from: "package.worken-landing-app",
+			to: "contract.shell-surface-bridge",
 		},
 		{
 			id: "rel.example.landing-dsl",
