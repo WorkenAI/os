@@ -8,6 +8,7 @@ import type {
 } from "./model.js";
 import type { EvaluationInput } from "./predicate.js";
 import { evaluatePredicate } from "./predicate.js";
+import { validateSemanticStructure } from "./validate.js";
 
 function indexRelations(relations: SemanticRelation[]): {
 	outgoing: Map<string, SemanticRelation[]>;
@@ -44,6 +45,7 @@ export function compileSemantic(source: SemanticSource): SemanticGraph {
 			);
 		}
 	}
+	validateSemanticStructure(source.nodes, relations);
 	const { outgoing, incoming } = indexRelations(relations);
 	return {
 		protocolVersion: source.protocolVersion,
@@ -65,6 +67,10 @@ function resolveBlockers(
 		const node = graph.byId.get(bid);
 		if (node?.kind === "blocker") {
 			result.push(node);
+		} else {
+			throw new Error(
+				`Action ${actionNode.id}: blockedBy id "${bid}" must reference a blocker node`,
+			);
 		}
 	}
 	if (result.length > 0) {

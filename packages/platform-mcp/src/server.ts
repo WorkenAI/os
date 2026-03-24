@@ -30,13 +30,16 @@ export interface PlatformMcpServerOptions {
 	platform: PlatformGraph;
 }
 
-function jsonResource(text: string): {
+function jsonResource(
+	uri: string,
+	text: string,
+): {
 	contents: { uri: string; mimeType: string; text: string }[];
 } {
 	return {
 		contents: [
 			{
-				uri: "",
+				uri,
 				mimeType: "application/json",
 				text,
 			},
@@ -118,7 +121,10 @@ export function createPlatformMcpServer(
 					);
 				}
 			}
-			return jsonResource(JSON.stringify({ terms }, null, 2));
+			return jsonResource(
+				"worken://glossary",
+				JSON.stringify({ terms }, null, 2),
+			);
 		},
 	);
 
@@ -136,16 +142,22 @@ export function createPlatformMcpServer(
 		"subsystem",
 		subsystemTemplate,
 		{ description: "Platform subsystem node" },
-		async (_uri, variables) => {
+		async (uri, variables) => {
 			const id = templateId(variables);
 			if (id === undefined) {
-				return jsonResource(JSON.stringify({ error: "missing_id" }));
+				return jsonResource(
+					uri.toString(),
+					JSON.stringify({ error: "missing_id" }),
+				);
 			}
 			const node = platform.byId.get(id);
 			if (!node || node.kind !== "subsystem") {
-				return jsonResource(JSON.stringify({ error: "not_found", id }));
+				return jsonResource(
+					uri.toString(),
+					JSON.stringify({ error: "not_found", id }),
+				);
 			}
-			return jsonResource(JSON.stringify(node, null, 2));
+			return jsonResource(uri.toString(), JSON.stringify(node, null, 2));
 		},
 	);
 
@@ -163,16 +175,22 @@ export function createPlatformMcpServer(
 		"package",
 		packageTemplate,
 		{ description: "Platform package node" },
-		async (_uri, variables) => {
+		async (uri, variables) => {
 			const id = templateId(variables);
 			if (id === undefined) {
-				return jsonResource(JSON.stringify({ error: "missing_id" }));
+				return jsonResource(
+					uri.toString(),
+					JSON.stringify({ error: "missing_id" }),
+				);
 			}
 			const node = platform.byId.get(id);
 			if (!node || node.kind !== "package") {
-				return jsonResource(JSON.stringify({ error: "not_found", id }));
+				return jsonResource(
+					uri.toString(),
+					JSON.stringify({ error: "not_found", id }),
+				);
 			}
-			return jsonResource(JSON.stringify(node, null, 2));
+			return jsonResource(uri.toString(), JSON.stringify(node, null, 2));
 		},
 	);
 
@@ -190,16 +208,22 @@ export function createPlatformMcpServer(
 		"contract",
 		contractTemplate,
 		{ description: "Platform contract node" },
-		async (_uri, variables) => {
+		async (uri, variables) => {
 			const id = templateId(variables);
 			if (id === undefined) {
-				return jsonResource(JSON.stringify({ error: "missing_id" }));
+				return jsonResource(
+					uri.toString(),
+					JSON.stringify({ error: "missing_id" }),
+				);
 			}
 			const node = platform.byId.get(id);
 			if (!node || node.kind !== "contract") {
-				return jsonResource(JSON.stringify({ error: "not_found", id }));
+				return jsonResource(
+					uri.toString(),
+					JSON.stringify({ error: "not_found", id }),
+				);
 			}
-			return jsonResource(JSON.stringify(node, null, 2));
+			return jsonResource(uri.toString(), JSON.stringify(node, null, 2));
 		},
 	);
 
@@ -217,16 +241,22 @@ export function createPlatformMcpServer(
 		"flow",
 		flowTemplate,
 		{ description: "Platform flow node" },
-		async (_uri, variables) => {
+		async (uri, variables) => {
 			const id = templateId(variables);
 			if (id === undefined) {
-				return jsonResource(JSON.stringify({ error: "missing_id" }));
+				return jsonResource(
+					uri.toString(),
+					JSON.stringify({ error: "missing_id" }),
+				);
 			}
 			const node = platform.byId.get(id);
 			if (!node || node.kind !== "flow") {
-				return jsonResource(JSON.stringify({ error: "not_found", id }));
+				return jsonResource(
+					uri.toString(),
+					JSON.stringify({ error: "not_found", id }),
+				);
 			}
-			return jsonResource(JSON.stringify(node, null, 2));
+			return jsonResource(uri.toString(), JSON.stringify(node, null, 2));
 		},
 	);
 
@@ -244,16 +274,22 @@ export function createPlatformMcpServer(
 		"example",
 		exampleTemplate,
 		{ description: "Platform example node" },
-		async (_uri, variables) => {
+		async (uri, variables) => {
 			const id = templateId(variables);
 			if (id === undefined) {
-				return jsonResource(JSON.stringify({ error: "missing_id" }));
+				return jsonResource(
+					uri.toString(),
+					JSON.stringify({ error: "missing_id" }),
+				);
 			}
 			const node = platform.byId.get(id);
 			if (!node || node.kind !== "example") {
-				return jsonResource(JSON.stringify({ error: "not_found", id }));
+				return jsonResource(
+					uri.toString(),
+					JSON.stringify({ error: "not_found", id }),
+				);
 			}
-			return jsonResource(JSON.stringify(node, null, 2));
+			return jsonResource(uri.toString(), JSON.stringify(node, null, 2));
 		},
 	);
 
@@ -271,16 +307,22 @@ export function createPlatformMcpServer(
 		"adr",
 		adrTemplate,
 		{ description: "Architecture decision record node" },
-		async (_uri, variables) => {
+		async (uri, variables) => {
 			const id = templateId(variables);
 			if (id === undefined) {
-				return jsonResource(JSON.stringify({ error: "missing_id" }));
+				return jsonResource(
+					uri.toString(),
+					JSON.stringify({ error: "missing_id" }),
+				);
 			}
 			const node = platform.byId.get(id);
 			if (!node || node.kind !== "adr") {
-				return jsonResource(JSON.stringify({ error: "not_found", id }));
+				return jsonResource(
+					uri.toString(),
+					JSON.stringify({ error: "not_found", id }),
+				);
 			}
-			return jsonResource(JSON.stringify(node, null, 2));
+			return jsonResource(uri.toString(), JSON.stringify(node, null, 2));
 		},
 	);
 

@@ -1,4 +1,5 @@
 export { compilePlatform, relatedPlatformNodes } from "./compile.js";
+export { mergePlatformSources } from "./merge.js";
 export type {
 	AdrNode,
 	CodeRef,
@@ -18,3 +19,4 @@ export type {
 	PlatformSource,
 	SubsystemNode,
 } from "./model.js";
+export { PlatformCompileError, validatePlatformStructure } from "./validate.js";

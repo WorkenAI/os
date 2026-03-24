@@ -4,6 +4,7 @@ import type {
 	PlatformRelation,
 	PlatformSource,
 } from "./model.js";
+import { validatePlatformStructure } from "./validate.js";
 
 function indexRelations(relations: PlatformRelation[]): {
 	outgoing: Map<string, PlatformRelation[]>;
@@ -40,6 +41,7 @@ export function compilePlatform(source: PlatformSource): PlatformGraph {
 			);
 		}
 	}
+	validatePlatformStructure(source.nodes, relations);
 	const { outgoing, incoming } = indexRelations(relations);
 	return {
 		version: source.version,

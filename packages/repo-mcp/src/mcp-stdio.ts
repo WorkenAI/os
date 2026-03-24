@@ -6,14 +6,16 @@ import { existsSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import { compilePlatform } from "@worken/platform-core";
+import { compilePlatform, mergePlatformSources } from "@worken/platform-core";
 import { createPlatformMcpServer } from "@worken/platform-mcp";
-import { compileSemantic } from "@worken/semantic-core";
+import { compileSemantic, mergeSemanticSources } from "@worken/semantic-core";
 import {
 	buildPlatformSourceFromWorkspace,
 	buildSemanticSourceForRepo,
 } from "./build-graph-from-repo.js";
+import { buildRepoManifestSource } from "./repo-manifest.js";
 import { loadWorkspacePackages } from "./scan-workspace.js";
+import { buildSemanticOverlayFromRepo } from "./semantic-overlay.js";
 
 const ROOT_MARKER = "worken-os";
 
@@ -61,8 +63,18 @@ function resolveRepoRoot(): string {
 
 const repoRoot = resolveRepoRoot();
 const pkgs = await loadWorkspacePackages(repoRoot);
-const platform = compilePlatform(buildPlatformSourceFromWorkspace(pkgs));
-const semantic = compileSemantic(buildSemanticSourceForRepo());
+const platform = compilePlatform(
+	mergePlatformSources(
+		buildPlatformSourceFromWorkspace(pkgs),
+		buildRepoManifestSource(repoRoot),
+	),
+);
+const semantic = compileSemantic(
+	mergeSemanticSources(
+		buildSemanticSourceForRepo(),
+		buildSemanticOverlayFromRepo(repoRoot),
+	),
+);
 
 const mcp = createPlatformMcpServer({ semantic, platform });
 const transport = new StdioServerTransport();

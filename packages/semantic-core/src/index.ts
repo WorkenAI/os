@@ -1,4 +1,5 @@
 export { compileSemantic, evaluateAction } from "./compile.js";
+export { mergeSemanticSources } from "./merge.js";
 export type {
 	ActionNode,
 	BindingNode,
@@ -22,3 +23,4 @@ export type {
 } from "./model.js";
 export type { EvaluationInput } from "./predicate.js";
 export { evaluatePredicate } from "./predicate.js";
+export { SemanticCompileError, validateSemanticStructure } from "./validate.js";

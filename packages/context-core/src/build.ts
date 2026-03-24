@@ -255,20 +255,46 @@ function buildRelatedNodes(
 	return deduped;
 }
 
+function effectiveAreaForBundle(
+	explicit: string | undefined,
+	preset: (typeof TASK_PRESETS)[TaskPresetId] | undefined,
+): string | undefined {
+	const a = normalizeArea(explicit);
+	if (a) {
+		return a;
+	}
+	const hints = preset?.areaHints;
+	if (!hints?.length) {
+		return undefined;
+	}
+	for (const h of hints) {
+		const n = normalizeArea(h);
+		if (n) {
+			return n;
+		}
+	}
+	return undefined;
+}
+
 export function buildContextBundle(input: BuildContextInput): ContextBundle {
 	const preset = isTaskPresetId(input.task)
 		? TASK_PRESETS[input.task]
 		: undefined;
 	const depth = input.depth ?? "compact";
+	const areaEffective = effectiveAreaForBundle(input.area, preset);
 	const glossary = collectGlossary(input.platform, input.semantic);
 	const invKeywords = preset?.invariantKeywords;
-	const invariants = collectInvariants(input.platform, input.area, invKeywords);
-	const examples = collectExamples(input.platform, input.area);
+	const invariants = collectInvariants(
+		input.platform,
+		areaEffective,
+		invKeywords,
+	);
+	const examples = collectExamples(input.platform, areaEffective);
 	const relatedNodes = buildRelatedNodes(
 		input.platform,
 		input.semantic,
 		preset?.id,
-		input.area,
+		areaEffective,
 		input.session,
 		depth,
 	);
@@ -276,16 +302,16 @@ export function buildContextBundle(input: BuildContextInput): ContextBundle {
 	const title = preset?.title ?? `Task: ${input.task}`;
 	const summary =
 		preset?.summary ??
-		`Context bundle for task "${input.task}"${input.area ? ` in area "${input.area}"` : ""}.`;
+		`Context bundle for task "${input.task}"${areaEffective ? ` in area "${areaEffective}"` : ""}.`;
 
-	const bundleId = `ctx.${input.task}${input.area ? `.${input.area}` : ""}`;
+	const bundleId = `ctx.${input.task}${areaEffective ? `.${areaEffective}` : ""}`;
 
 	return {
 		id: bundleId,
 		title,
 		summary,
 		task: input.task,
-		...(input.area !== undefined ? { area: input.area } : {}),
+		...(areaEffective !== undefined ? { area: areaEffective } : {}),
 		glossary,
 		invariants,
 		examples,

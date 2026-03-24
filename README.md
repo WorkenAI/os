@@ -33,7 +33,7 @@ To expose **the actual Worken OS workspace** (every workspace package under `app
 bun run mcp
 ```
 
-This starts stdio MCP: it walks the tree for `package.json`, builds a **platform graph** (subsystem `subsystem.worken-os-repo` + one `package.*` node per npm package, with refs to each manifest path), merges a minimal semantic anchor, and serves the usual `worken://…` resources and tools. Override the root directory if needed: `WORKEN_REPO_ROOT=/path/to/os bun run mcp`.
+This starts stdio MCP: it resolves **workspace packages** from the root `package.json` `workspaces` field (direct children only — e.g. `apps/*` → one package per app folder), merges a **repo manifest** (invariants, doc examples, ADRs from `docs/adrs/` when present), merges a semantic anchor + small glossary overlay, then serves the usual `worken://…` resources and tools. See `packages/repo-mcp/README.md` for `WORKEN_REPO_ROOT`, `WORKEN_REPO_MCP_EXCLUDE`, and `WORKEN_REPO_MCP_INCLUDE_EXAMPLES`.
 
 The `examples/minimal` folder remains optional wiring-only demos; **day-to-day agent integration should use `bun run mcp` above.**
 

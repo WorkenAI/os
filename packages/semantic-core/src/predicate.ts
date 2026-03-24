@@ -58,7 +58,11 @@ function deepEqual(a: unknown, b: LiteralValue): boolean {
 	if (a === b) {
 		return true;
 	}
-	if (a === undefined || a === null) {
+	// Missing path (undefined) must not match explicit null in JSON predicates
+	if (a === undefined) {
+		return false;
+	}
+	if (a === null) {
 		return b === null;
 	}
 	return a === b;
