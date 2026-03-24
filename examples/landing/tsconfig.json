@@ -1,0 +1,9 @@
+{
+	"extends": "@worken/tsconfig/library.json",
+	"compilerOptions": {
+		"outDir": "dist",
+		"rootDir": ".",
+		"types": ["node"]
+	},
+	"include": ["*.ts", "index.ts"]
+}

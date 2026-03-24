@@ -22,6 +22,9 @@
         "@radix-ui/react-slot": "^1.2.4",
         "@radix-ui/react-tooltip": "^1.2.8",
         "@tanstack/react-query": "^5.90.21",
+        "@worken/examples-landing": "workspace:*",
+        "@worken/semantic-core": "workspace:*",
+        "@worken/semantic-ir": "workspace:*",
         "@workflow/core": "^4.2.0-beta.71",
         "@workflow/next": "^4.0.1-beta.67",
         "@workflow/world-postgres": "^4.1.0-beta.45",
@@ -49,6 +52,21 @@
         "@workflow/typescript-plugin": "^4.0.1-beta.5",
         "bun-types": "^1.3.10",
         "tailwindcss": "^4.2.0",
+        "typescript": "^5.9.3",
+      },
+    },
+    "examples/landing": {
+      "name": "@worken/examples-landing",
+      "version": "0.0.1",
+      "dependencies": {
+        "@worken/context-core": "workspace:*",
+        "@worken/platform-core": "workspace:*",
+        "@worken/semantic-core": "workspace:*",
+        "@worken/semantic-ir": "workspace:*",
+      },
+      "devDependencies": {
+        "@types/node": "^22.10.0",
+        "@worken/tsconfig": "workspace:*",
         "typescript": "^5.9.3",
       },
     },
@@ -140,6 +158,7 @@
       "version": "0.0.1",
       "dependencies": {
         "@worken/code-graph": "workspace:*",
+        "@worken/examples-landing": "workspace:*",
         "@worken/platform-core": "workspace:*",
         "@worken/platform-mcp": "workspace:*",
         "@worken/semantic-core": "workspace:*",
@@ -750,6 +769,8 @@
     "@worken/code-graph": ["@worken/code-graph@workspace:packages/code-graph"],
 
     "@worken/context-core": ["@worken/context-core@workspace:packages/context-core"],
+
+    "@worken/examples-landing": ["@worken/examples-landing@workspace:examples/landing"],
 
     "@worken/examples-minimal": ["@worken/examples-minimal@workspace:examples/minimal"],
 

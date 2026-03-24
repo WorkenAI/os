@@ -23,6 +23,7 @@
 		"mcp": "bun run ./src/mcp-stdio.ts"
 	},
 	"dependencies": {
+		"@worken/examples-landing": "workspace:*",
 		"@worken/code-graph": "workspace:*",
 		"@worken/platform-core": "workspace:*",
 		"@worken/platform-mcp": "workspace:*",
