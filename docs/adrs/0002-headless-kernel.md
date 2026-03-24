@@ -25,3 +25,4 @@ The v0 headless kernel consists of:
 - Value is delivered as **bundles + MCP** without UI.
 - **Web Shell** and future shells remain projection layers over the same graphs.
 - The **platform graph** is explicitly separate from **runtime domain state** (see `semantic-protocol.md`).
+- **TypeScript code facts** (exports, imports, references) are a separate projection, documented as the **code semantics bridge** (ADR 0003, `docs/spec/code-semantics-bridge.md`). Repo layout in `repo-mcp` is not a substitute for symbol-level analysis.
