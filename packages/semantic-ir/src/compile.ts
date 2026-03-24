@@ -113,10 +113,16 @@ function projectionToSurface(p: ProjectionNode): SurfaceIRNode | undefined {
 	}
 	const id =
 		typeof bag.id === "string" ? bag.id : p.id.replace(/^projection\./, "surface.");
+	const shellLayoutId =
+		p.target === "web-shell" && typeof bag.shellLayoutId === "string"
+			? bag.shellLayoutId
+			: undefined;
 	return {
 		id,
 		title: typeof bag.title === "string" ? bag.title : p.title,
 		entity,
+		projectionTarget: p.target,
+		...(shellLayoutId !== undefined ? { shellLayoutId } : {}),
 		...(typeof bag.regions === "object" &&
 		bag.regions !== null &&
 		!Array.isArray(bag.regions)

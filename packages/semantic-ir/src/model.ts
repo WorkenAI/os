@@ -60,10 +60,24 @@ export interface PolicyIRNode {
 	};
 }
 
+export type SurfaceProjectionTarget =
+	| "web-shell"
+	| "chat-shell"
+	| "voice-shell"
+	| "api"
+	| "model-context";
+
 export interface SurfaceIRNode {
 	id: string;
 	title: string;
 	entity: string;
+	/** Which interaction surface this projection targets (Semantic Protocol projection node). */
+	projectionTarget: SurfaceProjectionTarget;
+	/**
+	 * When `projectionTarget` is `web-shell`, optional layout key for the Web Shell renderer
+	 * (e.g. matches `DomainShellSurfaceLayoutId` in the landing app).
+	 */
+	shellLayoutId?: string;
 	regions?: Record<string, string[]>;
 	actionBindings: string[];
 }

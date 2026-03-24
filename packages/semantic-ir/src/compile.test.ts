@@ -45,6 +45,18 @@ const demo: SemanticSource = {
 				right: "qualified",
 			},
 		},
+		{
+			id: "projection.candidate.detail",
+			kind: "projection",
+			title: "Candidate detail",
+			target: "model-context",
+			payload: {
+				id: "surface.candidate.detail",
+				title: "Candidate detail",
+				entity: "candidate",
+				actionBindings: ["action.candidate.schedule_interview"],
+			},
+		},
 	],
 	relations: [
 		{
@@ -72,6 +84,9 @@ test("compileSemanticIR is deterministic snapshot for same graph", () => {
 		a.policies["policy.action.candidate.schedule_interview.default"]?.subjects[0],
 		"role.hr_manager",
 	);
+	const surf = a.surfaces["surface.candidate.detail"];
+	assert.ok(surf);
+	assert.equal(surf.projectionTarget, "model-context");
 });
 
 test("different workspaceId changes schema but not body hash", () => {

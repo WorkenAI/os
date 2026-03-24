@@ -18,5 +18,6 @@ export type {
 	SemanticIR,
 	SemanticIRSchemaMeta,
 	SurfaceIRNode,
+	SurfaceProjectionTarget,
 	TransitionIRNode,
 } from "./model.js";
