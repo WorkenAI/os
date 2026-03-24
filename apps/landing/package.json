@@ -5,6 +5,7 @@
   "description": "Worken OS landing page",
   "type": "module",
   "scripts": {
+    "prebuild": "bun run scripts/write-semantic-ir-baseline.ts",
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
@@ -14,6 +15,9 @@
     "test": "node -e \"process.exit(0)\""
   },
   "dependencies": {
+    "@worken/examples-landing": "workspace:*",
+    "@worken/semantic-core": "workspace:*",
+    "@worken/semantic-ir": "workspace:*",
     "@json-render/core": "^0.13.0",
     "@json-render/react": "^0.13.0",
     "@radix-ui/react-avatar": "^1.1.11",

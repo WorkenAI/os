@@ -1,0 +1,125 @@
+{
+  "schema": {
+    "schemaVersion": "0.1.0",
+    "workspaceId": "worken-os",
+    "snapshotId": "sha256:e443d2a7dec54ef65927e40c349401aa1712c68c6c91d7c0d19152e1e4524040",
+    "generatedAt": "2026-03-24T15:13:43.869Z",
+    "semanticProtocolVersion": "0.1.0"
+  },
+  "entities": {
+    "object.candidate": {
+      "id": "object.candidate",
+      "title": "Candidate",
+      "fields": {
+        "status": {
+          "type": "enum",
+          "values": [
+            "new",
+            "screening",
+            "qualified",
+            "rejected",
+            "hired"
+          ],
+          "required": true
+        },
+        "phone": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "roles": {
+    "role.hr_manager": {
+      "id": "role.hr_manager",
+      "title": "HR Manager"
+    },
+    "role.recruiter_bot": {
+      "id": "role.recruiter_bot",
+      "title": "Recruiter Bot"
+    }
+  },
+  "actions": {
+    "action.candidate.schedule_interview": {
+      "id": "action.candidate.schedule_interview",
+      "title": "Schedule interview",
+      "domainId": "domain.demo-recruitment",
+      "objectId": "object.candidate",
+      "objectType": "object.candidate",
+      "when": {
+        "op": "and",
+        "args": [
+          {
+            "op": "eq",
+            "left": {
+              "scope": "object",
+              "path": "status"
+            },
+            "right": "qualified"
+          },
+          {
+            "op": "exists",
+            "value": {
+              "scope": "object",
+              "path": "phone"
+            }
+          }
+        ]
+      }
+    }
+  },
+  "policies": {
+    "policy.action.candidate.schedule_interview.default": {
+      "id": "policy.action.candidate.schedule_interview.default",
+      "actionId": "action.candidate.schedule_interview",
+      "effect": "allow",
+      "subjects": [
+        "role.hr_manager",
+        "role.recruiter_bot"
+      ],
+      "when": {
+        "op": "and",
+        "args": [
+          {
+            "op": "eq",
+            "left": {
+              "scope": "object",
+              "path": "status"
+            },
+            "right": "qualified"
+          },
+          {
+            "op": "exists",
+            "value": {
+              "scope": "object",
+              "path": "phone"
+            }
+          }
+        ]
+      }
+    }
+  },
+  "surfaces": {
+    "surface.candidate.detail": {
+      "id": "surface.candidate.detail",
+      "title": "Candidate detail",
+      "entity": "candidate",
+      "regions": {
+        "header": [
+          "candidate.name",
+          "candidate.status"
+        ],
+        "main": [
+          "candidate.timeline"
+        ]
+      },
+      "actionBindings": [
+        "action.candidate.schedule_interview"
+      ]
+    }
+  },
+  "transitions": {},
+  "bindings": {}
+}
