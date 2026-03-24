@@ -124,6 +124,7 @@
         "@worken/context-core": "workspace:*",
         "@worken/platform-core": "workspace:*",
         "@worken/semantic-core": "workspace:*",
+        "@worken/semantic-ir": "workspace:*",
         "zod": "^4.3.6",
       },
       "devDependencies": {
@@ -145,6 +146,7 @@
       "devDependencies": {
         "@types/node": "^22.10.0",
         "@worken/context-core": "workspace:*",
+        "@worken/semantic-ir": "workspace:*",
         "@worken/tsconfig": "workspace:*",
         "tsx": "^4.19.2",
         "typescript": "^5.9.3",
@@ -153,6 +155,19 @@
     "packages/semantic-core": {
       "name": "@worken/semantic-core",
       "version": "0.0.1",
+      "devDependencies": {
+        "@types/node": "^22.10.0",
+        "@worken/tsconfig": "workspace:*",
+        "tsx": "^4.19.2",
+        "typescript": "^5.9.3",
+      },
+    },
+    "packages/semantic-ir": {
+      "name": "@worken/semantic-ir",
+      "version": "0.0.1",
+      "dependencies": {
+        "@worken/semantic-core": "workspace:*",
+      },
       "devDependencies": {
         "@types/node": "^22.10.0",
         "@worken/tsconfig": "workspace:*",
@@ -734,6 +749,8 @@
     "@worken/repo-mcp": ["@worken/repo-mcp@workspace:packages/repo-mcp"],
 
     "@worken/semantic-core": ["@worken/semantic-core@workspace:packages/semantic-core"],
+
+    "@worken/semantic-ir": ["@worken/semantic-ir@workspace:packages/semantic-ir"],
 
     "@worken/session-core": ["@worken/session-core@workspace:packages/session-core"],
 

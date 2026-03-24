@@ -10,7 +10,9 @@ Turns the **current Worken OS monorepo** into the graphs consumed by `@worken/pl
 
 3. **Semantic overlay** — merged with the domain anchor: optional **glossary-term** from `docs/adrs/0002-headless-kernel.md` when the file exists.
 
-4. **Code graph** — `@worken/code-graph` (TypeScript exports, imports, package boundaries) is always merged into the platform graph. Use `WORKEN_CODE_GRAPH_PACKAGES` to narrow scope for large repos.
+4. **Semantic IR demo slice** — `buildSemanticIRDemoSource()` merges a small operational example (roles, action `schedule_interview`, surface projection) so MCP exposes `worken://semantic-ir` and tools `list_allowed_actions` / `explain_action` / `resolve_surface`.
+
+5. **Code graph** — `@worken/code-graph` (TypeScript exports, imports, package boundaries) is always merged into the platform graph. Use `WORKEN_CODE_GRAPH_PACKAGES` to narrow scope for large repos.
 
 Use `mergePlatformSources` / `mergeSemanticSources` from `@worken/platform-core` / `@worken/semantic-core` so live MCP stays a **single compiled graph** with stable overrides.
 

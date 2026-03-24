@@ -1,9 +1,9 @@
 {
-	"name": "@worken/platform-mcp",
+	"name": "@worken/semantic-ir",
 	"version": "0.0.1",
 	"private": false,
 	"type": "module",
-	"description": "Read-only MCP server for Worken platform and semantic graphs",
+	"description": "Canonical Semantic IR: deterministic projection of operational semantics",
 	"exports": {
 		".": {
 			"types": "./dist/index.d.ts",
@@ -22,12 +22,7 @@
 		"test": "node --import tsx --test src/**/*.test.ts"
 	},
 	"dependencies": {
-		"@modelcontextprotocol/sdk": "^1.27.1",
-		"@worken/context-core": "workspace:*",
-		"@worken/platform-core": "workspace:*",
-		"@worken/semantic-core": "workspace:*",
-		"@worken/semantic-ir": "workspace:*",
-		"zod": "^4.3.6"
+		"@worken/semantic-core": "workspace:*"
 	},
 	"devDependencies": {
 		"@types/node": "^22.10.0",

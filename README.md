@@ -10,12 +10,13 @@ Under the hood, it is an operational model that ties together interaction surfac
 
 The repository includes a **browser-independent** layer that compiles **semantic** and **platform** graphs, builds **compact context bundles** for code agents, and can expose read-only access via **MCP** (Model Context Protocol). Shells and UIs are future renderers; the same graphs back agents and tooling.
 
-Flow: **manifests / sources → graphs → context bundles → MCP**.
+Flow: **manifests / sources → graphs → Semantic IR → context bundles / MCP**.
 
 | Package | Role |
 |---------|------|
 | `@worken/ids` | Stable ids, `NodeRef`, canonical addressing |
 | `@worken/semantic-core` | Operational semantic graph, predicates, `evaluateAction` |
+| `@worken/semantic-ir` | **Canonical Semantic IR** from `SemanticGraph` (`compileSemanticIR`, `explainAction`, deterministic `snapshotId`) |
 | `@worken/platform-core` | Contributor/platform graph (subsystems, packages, contracts, invariants, …) |
 | `@worken/session-core` | Minimal `WorkSession` / `createSession` |
 | `@worken/context-core` | `ContextBundle`, `buildContextBundle`, task presets (`add_adapter`, …) |
@@ -24,7 +25,7 @@ Flow: **manifests / sources → graphs → context bundles → MCP**.
 | `@worken/repo-mcp` | **Scan this monorepo** (`package.json` in `apps/` and `packages/`) and feed the result into `@worken/platform-mcp` — no toy dataset |
 | `@worken/code-graph` | TypeScript Compiler API → **code IR** (exports, `depends-on`, symbols); merged into MCP by default |
 
-See `docs/adrs/0002-headless-kernel.md` and `docs/spec/semantic-protocol.md` for protocol details.
+See `docs/adrs/0002-headless-kernel.md`, `docs/adrs/0004-semantic-ir.md`, `docs/spec/semantic-ir.md`, and `docs/spec/semantic-protocol.md` for protocol details.
 
 ### MCP: this repository as model context
 
@@ -34,7 +35,7 @@ To expose **the actual Worken OS workspace** (every workspace package under `app
 bun run mcp
 ```
 
-This starts stdio MCP: it resolves **workspace packages** from the root `package.json` `workspaces` field (direct children only — e.g. `apps/*` → one package per app folder), merges a **repo manifest** (invariants, doc examples, ADRs from `docs/adrs/` when present), merges a semantic anchor + small glossary overlay, then serves the usual `worken://…` resources and tools. See `packages/repo-mcp/README.md` for `WORKEN_REPO_ROOT`, `WORKEN_REPO_MCP_EXCLUDE`, and `WORKEN_REPO_MCP_INCLUDE_EXAMPLES`.
+This starts stdio MCP: it resolves **workspace packages** from the root `package.json` `workspaces` field (direct children only — e.g. `apps/*` → one package per app folder), merges a **repo manifest** (invariants, doc examples, ADRs from `docs/adrs/` when present), merges a semantic anchor + glossary overlay + a small **Semantic IR demo** slice (actions, roles, surface), merges **TypeScript code graph**, then serves `worken://…` resources (including `worken://semantic-ir`) and tools (`list_allowed_actions`, `explain_action`, `resolve_surface`, …). See `packages/repo-mcp/README.md` for `WORKEN_REPO_ROOT`, `WORKEN_REPO_MCP_EXCLUDE`, and `WORKEN_REPO_MCP_INCLUDE_EXAMPLES`.
 
 The `examples/minimal` folder remains optional wiring-only demos; **day-to-day agent integration should use `bun run mcp` above.**
 
@@ -140,9 +141,10 @@ flowchart TB
 |------|------|
 | `apps/landing` | Next.js app (marketing / shell entrypoints) |
 | `packages/tsconfig` | Shared TypeScript presets (`@worken/tsconfig`) |
-| `packages/*` | Libraries: ids, semantic-core, platform-core, session-core, context-core, testkit, platform-mcp, **repo-mcp** (monorepo → MCP) |
+| `packages/*` | Libraries: ids, semantic-core, **semantic-ir**, platform-core, session-core, context-core, testkit, platform-mcp, **repo-mcp** (monorepo → MCP) |
 | `examples/minimal` | Minimal semantic + platform sources, bundle build, MCP bootstrap |
 | `docs/spec/semantic-protocol.md` | Semantic protocol specification |
+| `docs/spec/semantic-ir.md` | Semantic IR (canonical operational representation) |
 | `docs/adrs/` | Architecture decision records |
 
 ## Development

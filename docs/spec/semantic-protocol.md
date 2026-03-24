@@ -778,6 +778,8 @@ Canonical representation of:
 - effects
 - UI hints
 
+The repository implementation of this layer is **`@worken/semantic-ir`**: it projects a compiled `SemanticGraph` into **Semantic IR** (schema metadata, entities, roles, actions, policies, surfaces, transitions, bindings) with a deterministic `snapshotId`. See `docs/spec/semantic-ir.md` and ADR `docs/adrs/0004-semantic-ir.md`.
+
 ### 3. Evaluation indexes
 
 Fast lookup structures by:

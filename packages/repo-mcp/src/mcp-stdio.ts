@@ -12,6 +12,7 @@ import { createPlatformMcpServer } from "@worken/platform-mcp";
 import { compileSemantic, mergeSemanticSources } from "@worken/semantic-core";
 import {
 	buildPlatformSourceFromWorkspace,
+	buildSemanticIRDemoSource,
 	buildSemanticSourceForRepo,
 } from "./build-graph-from-repo.js";
 import { buildRepoManifestSource } from "./repo-manifest.js";
@@ -85,10 +86,15 @@ const platform = compilePlatform(mergePlatformSources(...platformPieces));
 const semantic = compileSemantic(
 	mergeSemanticSources(
 		buildSemanticSourceForRepo(),
+		buildSemanticIRDemoSource(),
 		buildSemanticOverlayFromRepo(repoRoot),
 	),
 );
 
-const mcp = createPlatformMcpServer({ semantic, platform });
+const mcp = createPlatformMcpServer({
+	semantic,
+	platform,
+	irWorkspaceId: "worken-os",
+});
 const transport = new StdioServerTransport();
 await mcp.connect(transport);

@@ -1,5 +1,6 @@
 export {
 	buildPlatformSourceFromWorkspace,
+	buildSemanticIRDemoSource,
 	buildSemanticSourceForRepo,
 } from "./build-graph-from-repo.js";
 export { npmNameToPackageNodeId, packageNodeId } from "./ids.js";

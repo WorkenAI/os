@@ -6,6 +6,12 @@ import { buildContextBundle, buildImpactBundle } from "@worken/context-core";
 import type { PlatformGraph } from "@worken/platform-core";
 import { relatedPlatformNodes } from "@worken/platform-core";
 import type { SemanticGraph } from "@worken/semantic-core";
+import {
+	compileSemanticIR,
+	explainAction,
+	listAllowedActions,
+	type SemanticIR,
+} from "@worken/semantic-ir";
 import { z } from "zod";
 
 function templateId(
@@ -28,6 +34,13 @@ Flow: manifests + semantic source → graphs → context bundles → MCP.
 export interface PlatformMcpServerOptions {
 	semantic: SemanticGraph;
 	platform: PlatformGraph;
+	/**
+	 * Pre-built Semantic IR; if omitted, compiled deterministically from `semantic`
+	 * via `@worken/semantic-ir` (same graph → same `snapshotId` in IR body).
+	 */
+	semanticIr?: SemanticIR;
+	/** Workspace id stored in IR schema metadata (default: worken-os) */
+	irWorkspaceId?: string;
 }
 
 function jsonResource(
@@ -67,12 +80,18 @@ export function createPlatformMcpServer(
 	options: PlatformMcpServerOptions,
 ): McpServer {
 	const { semantic, platform } = options;
+	const semanticIr =
+		options.semanticIr ??
+		compileSemanticIR(semantic, {
+			workspaceId: options.irWorkspaceId ?? "worken-os",
+			semanticProtocolVersion: semantic.protocolVersion,
+		});
 
 	const mcp = new McpServer(
 		{ name: "worken-platform", version: "0.0.1" },
 		{
 			instructions:
-				"Read-only Worken platform MCP: graphs, invariants, examples, and task bundles. No writes.",
+				"Read-only Worken platform MCP: platform + semantic graphs, Semantic IR (canonical operational slice), context bundles, and explain/list tools. No writes.",
 		},
 	);
 
@@ -126,6 +145,21 @@ export function createPlatformMcpServer(
 				JSON.stringify({ terms }, null, 2),
 			);
 		},
+	);
+
+	mcp.registerResource(
+		"semantic_ir",
+		"worken://semantic-ir",
+		{
+			description:
+				"Canonical Semantic IR (Stage 1): entities, roles, actions, policies, surfaces, bindings",
+			mimeType: "application/json",
+		},
+		async (uri) =>
+			jsonResource(
+				uri.toString(),
+				JSON.stringify(semanticIr, null, 2),
+			),
 	);
 
 	const subsystemTemplate = new ResourceTemplate("worken://subsystems/{id}", {
@@ -493,6 +527,142 @@ export function createPlatformMcpServer(
 			return {
 				content: [
 					{ type: "text" as const, text: JSON.stringify(bundle, null, 2) },
+				],
+			};
+		},
+	);
+
+	mcp.registerTool(
+		"list_allowed_actions",
+		{
+			description:
+				"List action ids allowed by Semantic IR policies and predicates for the given subject/object (and optional role).",
+			inputSchema: {
+				roleId: z.string().optional(),
+				subjectJson: z.string().default("{}"),
+				objectJson: z.string().default("{}"),
+				contextJson: z.string().optional(),
+			},
+		},
+		async (args) => {
+			let subject: Record<string, unknown>;
+			let object: Record<string, unknown>;
+			let context: Record<string, unknown> | undefined;
+			try {
+				subject = JSON.parse(args.subjectJson) as Record<string, unknown>;
+				object = JSON.parse(args.objectJson) as Record<string, unknown>;
+				if (args.contextJson !== undefined) {
+					context = JSON.parse(args.contextJson) as Record<string, unknown>;
+				}
+			} catch (e) {
+				return {
+					content: [
+						{
+							type: "text" as const,
+							text: JSON.stringify({
+								error: "invalid_json",
+								message: String(e),
+							}),
+						},
+					],
+				};
+			}
+			const ids = listAllowedActions(semanticIr, {
+				...(args.roleId !== undefined ? { roleId: args.roleId } : {}),
+				subject,
+				object,
+				...(context !== undefined ? { context } : {}),
+			});
+			return {
+				content: [
+					{
+						type: "text" as const,
+						text: JSON.stringify(
+							{ actionIds: ids, snapshotId: semanticIr.schema.snapshotId },
+							null,
+							2,
+						),
+					},
+				],
+			};
+		},
+	);
+
+	mcp.registerTool(
+		"explain_action",
+		{
+			description:
+				"Explain whether an action is allowed (Semantic IR policy + predicates) for subject/object and optional role.",
+			inputSchema: {
+				actionId: z.string(),
+				roleId: z.string().optional(),
+				subjectJson: z.string().default("{}"),
+				objectJson: z.string().default("{}"),
+				contextJson: z.string().optional(),
+			},
+		},
+		async (args) => {
+			let subject: Record<string, unknown>;
+			let object: Record<string, unknown>;
+			let context: Record<string, unknown> | undefined;
+			try {
+				subject = JSON.parse(args.subjectJson) as Record<string, unknown>;
+				object = JSON.parse(args.objectJson) as Record<string, unknown>;
+				if (args.contextJson !== undefined) {
+					context = JSON.parse(args.contextJson) as Record<string, unknown>;
+				}
+			} catch (e) {
+				return {
+					content: [
+						{
+							type: "text" as const,
+							text: JSON.stringify({
+								error: "invalid_json",
+								message: String(e),
+							}),
+						},
+					],
+				};
+			}
+			const result = explainAction(semanticIr, {
+				actionId: args.actionId,
+				...(args.roleId !== undefined ? { roleId: args.roleId } : {}),
+				subject,
+				object,
+				...(context !== undefined ? { context } : {}),
+			});
+			return {
+				content: [
+					{
+						type: "text" as const,
+						text: JSON.stringify(
+							{ ...result, snapshotId: semanticIr.schema.snapshotId },
+							null,
+							2,
+						),
+					},
+				],
+			};
+		},
+	);
+
+	mcp.registerTool(
+		"resolve_surface",
+		{
+			description:
+				"Return a Semantic IR surface by id (semantic composition for agents/shells).",
+			inputSchema: {
+				surfaceId: z.string(),
+			},
+		},
+		async (args) => {
+			const s = semanticIr.surfaces[args.surfaceId];
+			return {
+				content: [
+					{
+						type: "text" as const,
+						text: JSON.stringify(s ?? null, null, 2),
+					},
 				],
 			};
 		},

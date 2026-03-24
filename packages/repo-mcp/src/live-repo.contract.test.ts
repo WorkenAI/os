@@ -5,8 +5,10 @@ import { describe, it } from "node:test";
 import { fileURLToPath } from "node:url";
 import { compilePlatform, mergePlatformSources } from "@worken/platform-core";
 import { compileSemantic, mergeSemanticSources } from "@worken/semantic-core";
+import { compileSemanticIR } from "@worken/semantic-ir";
 import {
 	buildPlatformSourceFromWorkspace,
+	buildSemanticIRDemoSource,
 	buildSemanticSourceForRepo,
 } from "./build-graph-from-repo.js";
 import { buildRepoManifestSource } from "./repo-manifest.js";
@@ -74,6 +76,7 @@ describe("live repo MCP graphs", () => {
 		const semantic = compileSemantic(
 			mergeSemanticSources(
 				buildSemanticSourceForRepo(),
+				buildSemanticIRDemoSource(),
 				buildSemanticOverlayFromRepo(REPO_ROOT),
 			),
 		);
@@ -88,5 +91,21 @@ describe("live repo MCP graphs", () => {
 				(i: { id: string }) => i.id === "invariant.repo.mcp-readonly",
 			),
 		);
+	});
+
+	it("Semantic IR demo compiles with schedule_interview and surface", () => {
+		const semantic = compileSemantic(
+			mergeSemanticSources(
+				buildSemanticSourceForRepo(),
+				buildSemanticIRDemoSource(),
+			),
+		);
+		const ir = compileSemanticIR(semantic, {
+			workspaceId: "worken-os",
+			semanticProtocolVersion: semantic.protocolVersion,
+		});
+		assert.ok(ir.actions["action.candidate.schedule_interview"]);
+		assert.ok(ir.surfaces["surface.candidate.detail"]);
+		assert.ok(ir.policies["policy.action.candidate.schedule_interview.default"]);
 	});
 });
