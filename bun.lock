@@ -120,6 +120,21 @@
         "typescript": "^5.9.3",
       },
     },
+    "packages/repo-mcp": {
+      "name": "@worken/repo-mcp",
+      "version": "0.0.1",
+      "dependencies": {
+        "@worken/platform-core": "workspace:*",
+        "@worken/platform-mcp": "workspace:*",
+        "@worken/semantic-core": "workspace:*",
+      },
+      "devDependencies": {
+        "@types/node": "^22.10.0",
+        "@worken/tsconfig": "workspace:*",
+        "tsx": "^4.19.2",
+        "typescript": "^5.9.3",
+      },
+    },
     "packages/semantic-core": {
       "name": "@worken/semantic-core",
       "version": "0.0.1",
@@ -698,6 +713,8 @@
     "@worken/platform-core": ["@worken/platform-core@workspace:packages/platform-core"],
 
     "@worken/platform-mcp": ["@worken/platform-mcp@workspace:packages/platform-mcp"],
+
+    "@worken/repo-mcp": ["@worken/repo-mcp@workspace:packages/repo-mcp"],
 
     "@worken/semantic-core": ["@worken/semantic-core@workspace:packages/semantic-core"],
 

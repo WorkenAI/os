@@ -21,8 +21,21 @@ Flow: **manifests / sources → graphs → context bundles → MCP**.
 | `@worken/context-core` | `ContextBundle`, `buildContextBundle`, task presets (`add_adapter`, …) |
 | `@worken/testkit` | Graph fixtures and bundle assertions |
 | `@worken/platform-mcp` | Read-only MCP server: resources (`worken://…`), tools (`get_node`, `bundle_for_task`, …), prompts |
+| `@worken/repo-mcp` | **Scan this monorepo** (`package.json` in `apps/` and `packages/`) and feed the result into `@worken/platform-mcp` — no toy dataset |
 
 See `docs/adrs/0002-headless-kernel.md` and `docs/spec/semantic-protocol.md` for protocol details.
+
+### MCP: this repository as model context
+
+To expose **the actual Worken OS workspace** (every workspace package under `apps/*` and `packages/*`) to an MCP client, run from the **repository root**:
+
+```bash
+bun run mcp
+```
+
+This starts stdio MCP: it walks the tree for `package.json`, builds a **platform graph** (subsystem `subsystem.worken-os-repo` + one `package.*` node per npm package, with refs to each manifest path), merges a minimal semantic anchor, and serves the usual `worken://…` resources and tools. Override the root directory if needed: `WORKEN_REPO_ROOT=/path/to/os bun run mcp`.
+
+The `examples/minimal` folder remains optional wiring-only demos; **day-to-day agent integration should use `bun run mcp` above.**
 
 ### Minimal example
 
@@ -126,7 +139,7 @@ flowchart TB
 |------|------|
 | `apps/landing` | Next.js app (marketing / shell entrypoints) |
 | `packages/tsconfig` | Shared TypeScript presets (`@worken/tsconfig`) |
-| `packages/*` | Libraries: ids, semantic-core, platform-core, session-core, context-core, testkit, platform-mcp |
+| `packages/*` | Libraries: ids, semantic-core, platform-core, session-core, context-core, testkit, platform-mcp, **repo-mcp** (monorepo → MCP) |
 | `examples/minimal` | Minimal semantic + platform sources, bundle build, MCP bootstrap |
 | `docs/spec/semantic-protocol.md` | Semantic protocol specification |
 | `docs/adrs/` | Architecture decision records |
@@ -154,6 +167,7 @@ Useful root scripts:
 | `bun run test` | Run package unit tests |
 | `bun run check-types` | Typecheck workspaces |
 | `bun run lint` | Lint (Biome) |
+| `bun run mcp` | MCP server: **live repo scan** → model context (stdio) |
 
 ## Contributing
 
