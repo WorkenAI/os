@@ -1,0 +1,15 @@
+{
+  "name": "@worken/ir",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./domain-colors": "./src/domain-colors.ts",
+    "./domains/*": "./src/domains/*.ts",
+    "./*": "./src/*"
+  },
+  "dependencies": {
+    "@json-render/core": "^0.13.0",
+    "zod": "^4.3.6"
+  }
+}

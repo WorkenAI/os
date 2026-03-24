@@ -1,0 +1,12 @@
+{
+  "extends": "../tsconfig/library.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "jsx": "react-jsx",
+    "lib": ["ES2022"],
+    "paths": {
+      "@worken/ir/*": ["./src/*"]
+    }
+  },
+  "include": ["src/**/*.ts", "src/**/*.tsx"]
+}

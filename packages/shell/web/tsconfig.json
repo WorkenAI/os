@@ -1,0 +1,17 @@
+{
+  "extends": "../../tsconfig/library.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "jsx": "react-jsx",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "paths": {
+      "@worken/ir/*": ["../ir/src/*"],
+      "@worken/shell-web/*": ["./src/*"],
+      "@worken/demo/*": ["../../../examples/demo/*"],
+      "@/components/*": ["../../../apps/web/src/components/*"],
+      "@/lib/*": ["../../../apps/web/src/lib/*"],
+      "@/execution/*": ["../../../apps/web/src/execution/*"]
+    }
+  },
+  "include": ["src/**/*.ts", "src/**/*.tsx"]
+}
