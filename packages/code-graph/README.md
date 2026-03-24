@@ -21,4 +21,4 @@ WORKEN_CODE_GRAPH_PACKAGES=@worken/context-core,@worken/semantic-core bun run co
 
 ## MCP
 
-Set `WORKEN_MCP_CODE_GRAPH=1` when starting `repo-mcp` (see root `bun run mcp:code` or `.cursor/mcp.json`).
+`repo-mcp` always merges this graph into the platform graph (`bun run mcp` from the repo root). Optional: `WORKEN_CODE_GRAPH_PACKAGES=…` to limit packages.

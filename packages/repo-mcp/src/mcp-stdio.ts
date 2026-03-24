@@ -68,21 +68,19 @@ const platformPieces = [
 	buildPlatformSourceFromWorkspace(pkgs),
 	buildRepoManifestSource(repoRoot),
 ];
-if (process.env.WORKEN_MCP_CODE_GRAPH === "1") {
-	const pkgsFilter = process.env.WORKEN_CODE_GRAPH_PACKAGES;
-	const codeGraph = buildCodeGraph(
-		repoRoot,
-		pkgsFilter
-			? {
-					includePackages: pkgsFilter
-						.split(",")
-						.map((s) => s.trim())
-						.filter(Boolean),
-				}
-			: {},
-	);
-	platformPieces.push(codeGraphToPlatformSource(codeGraph));
-}
+const pkgsFilter = process.env.WORKEN_CODE_GRAPH_PACKAGES;
+const codeGraph = buildCodeGraph(
+	repoRoot,
+	pkgsFilter
+		? {
+				includePackages: pkgsFilter
+					.split(",")
+					.map((s) => s.trim())
+					.filter(Boolean),
+			}
+		: {},
+);
+platformPieces.push(codeGraphToPlatformSource(codeGraph));
 const platform = compilePlatform(mergePlatformSources(...platformPieces));
 const semantic = compileSemantic(
 	mergeSemanticSources(

@@ -60,7 +60,7 @@ Downstream **impact**: if `SemanticGraph` changes in `@worken/semantic-core`, re
 
 ## Implementation in this repo
 
-The package **`@worken/code-graph`** builds a normalized `CodeGraph` from the TypeScript program and can project it into **`PlatformSource`** via `codeGraphToPlatformSource()` for merging with `repo-mcp` when `WORKEN_MCP_CODE_GRAPH=1`.
+The package **`@worken/code-graph`** builds a normalized `CodeGraph` from the TypeScript program and projects it into **`PlatformSource`** via `codeGraphToPlatformSource()` for merging with `repo-mcp` (always on for the live MCP server).
 
 ## References
 

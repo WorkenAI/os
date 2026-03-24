@@ -10,6 +10,8 @@ Turns the **current Worken OS monorepo** into the graphs consumed by `@worken/pl
 
 3. **Semantic overlay** — merged with the domain anchor: optional **glossary-term** from `docs/adrs/0002-headless-kernel.md` when the file exists.
 
+4. **Code graph** — `@worken/code-graph` (TypeScript exports, imports, package boundaries) is always merged into the platform graph. Use `WORKEN_CODE_GRAPH_PACKAGES` to narrow scope for large repos.
+
 Use `mergePlatformSources` / `mergeSemanticSources` from `@worken/platform-core` / `@worken/semantic-core` so live MCP stays a **single compiled graph** with stable overrides.
 
 ## Environment
@@ -19,7 +21,6 @@ Use `mergePlatformSources` / `mergeSemanticSources` from `@worken/platform-core`
 | `WORKEN_REPO_ROOT` | (auto-detect) | Absolute path to monorepo root |
 | `WORKEN_REPO_MCP_EXCLUDE` | `examples/*` | Comma-separated path prefixes to skip under repo root (after workspace resolution) |
 | `WORKEN_REPO_MCP_INCLUDE_EXAMPLES` | unset | Set to `1` to include `examples/*` packages |
-| `WORKEN_MCP_CODE_GRAPH` | unset | Set to `1` to merge `@worken/code-graph` (TS exports/imports) into the platform graph |
 | `WORKEN_CODE_GRAPH_PACKAGES` | unset | Optional comma-separated npm names to limit code graph (e.g. `@worken/context-core`) |
 
 ## Usage

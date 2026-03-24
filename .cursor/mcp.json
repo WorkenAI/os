@@ -2,10 +2,7 @@
 	"mcpServers": {
 		"worken-platform": {
 			"command": "bun",
-			"args": ["./packages/repo-mcp/src/mcp-stdio.ts"],
-			"env": {
-				"WORKEN_MCP_CODE_GRAPH": "1"
-			}
+			"args": ["./packages/repo-mcp/src/mcp-stdio.ts"]
 		}
 	}
 }
