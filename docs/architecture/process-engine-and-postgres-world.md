@@ -84,6 +84,7 @@ Semantic enrichment (`buildShellEvaluationContext` + `enrichShellSpec`) is **opt
 | Execution / signals (today) | `apps/web-shell/src/execution/service.ts`, `store.ts` |
 | DSL process types | `packages/dsl/src/process/types.ts` |
 | Shell semantic runtime | `packages/shell-runtime` |
+| Process manager (WorkItem, web + CLI) | [process-manager.md](./process-manager.md) |
 
 ---
 

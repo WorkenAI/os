@@ -4,7 +4,7 @@ This document is written for **humans and AI agents** (clear structure, stable t
 
 **Status:** Normative for product direction; the codebase may still be mid-migration. When behavior or layout changes, update this file in the same PR.
 
-**Related:** [Semantic protocol](../spec/semantic-protocol.md) (domain actions, policies, broader semantic layer). [Process engine + Postgres World](./process-engine-and-postgres-world.md) (headless transitions, AI). This doc focuses on **application/process/UI binding** and the **compiler boundary**.
+**Related:** [Semantic protocol](../spec/semantic-protocol.md) (domain actions, policies, broader semantic layer). [Process engine + Postgres World](./process-engine-and-postgres-world.md) (headless transitions, AI). [Process manager](./process-manager.md) (WorkItem, web + CLI tops). This doc focuses on **application/process/UI binding** and the **compiler boundary**.
 
 ---
 
@@ -203,6 +203,7 @@ Exact names may evolve; intent:
 | Layering comment | `packages/dsl/src/semantic-stack.ts` |
 | Spec enrichment + session contracts | `packages/shell-runtime` |
 | Process engine + Postgres World (target) | [process-engine-and-postgres-world.md](./process-engine-and-postgres-world.md) |
+| Process manager (`WorkItem`, web + CLI) | [process-manager.md](./process-manager.md), `packages/shell-runtime/src/work-item.ts` |
 | Process validation | `packages/dsl/src/process/validate.ts` |
 | Single-entry `defineWorkenApp` | `packages/worken-dsl-app/src/builder.ts` |
 | Example (IT request) | `examples/it-request-workspace/src/worken.app.ts` |

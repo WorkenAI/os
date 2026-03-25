@@ -10,3 +10,4 @@ export {
   defaultLocalShellIdentity,
   type LocalShellIdentity,
 } from './local-session.js'
+export type { WorkItem, WorkItemListFilter } from './work-item.js'
