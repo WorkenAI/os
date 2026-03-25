@@ -206,6 +206,8 @@ Exact names may evolve; intent:
 | Process validation | `packages/dsl/src/process/validate.ts` |
 | Single-entry `defineWorkenApp` | `packages/worken-dsl-app/src/builder.ts` |
 | Example (IT request) | `examples/it-request-workspace/src/worken.app.ts` |
+| Shared shell runtime (web + CLI) | `packages/shell-runtime` (`enrichShellSpec`, session contract) |
+| CLI shell | `apps/cli-shell` (`worken-shell` — Inquirer + same enrichment) |
 
 ---
 

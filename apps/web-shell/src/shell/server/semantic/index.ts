@@ -1,6 +1,6 @@
 /**
  * Semantic Spec enrichment — **server only** (WorkSession + role → `@worken/dsl` → `Spec.state`).
+ * Implementation lives in `@worken/shell-runtime`; this barrel preserves `@/shell/server/semantic` imports.
  */
-export { buildShellEvaluationContext } from './evaluation-context'
-export { enrichShellSpec } from './enrich-spec'
-export type { ShellSemanticEnrichmentInput } from './shell-semantic-input'
+export type { ShellSemanticEnrichmentInput } from '@worken/shell-runtime'
+export { buildShellEvaluationContext, enrichShellSpec } from '@worken/shell-runtime'

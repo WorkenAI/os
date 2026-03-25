@@ -2,10 +2,10 @@ import {
   WORKEN_ORGANIZATION_ID,
   WORKEN_PROJECT_ID,
   WORKEN_USER_ID,
-  type WorkenActorRef,
   type WorkenOsSession,
   type WorkenWorkspaceRef,
 } from '@/lib/worken-os-contract'
+import { createLocalShellSession } from '@worken/shell-runtime'
 import { getPolicySession, type PolicySession } from '@/shell/server/policy/service'
 import { getStoredShellSession, upsertStoredShellSession } from '../persistence/session-repository'
 
@@ -63,53 +63,6 @@ function readShellIdentity(headers: HeaderReader | undefined): ResolvedShellIden
   }
 }
 
-function buildActor(identity: ResolvedShellIdentity, roleId: string): WorkenActorRef {
-  return {
-    kind: 'human',
-    id: identity.actorId,
-    roleId,
-  }
-}
-
-function buildShellSession(input: {
-  identity: ResolvedShellIdentity
-  currentRoleId: string
-  existing?: WorkenOsSession | null
-}): WorkenOsSession {
-  const now = new Date().toISOString()
-  const actor = buildActor(input.identity, input.currentRoleId)
-
-  if (input.existing) {
-    return {
-      ...input.existing,
-      actor,
-      currentRoleId: input.currentRoleId,
-      workspace: input.identity.workspace,
-      scope: 'shell',
-      status: 'active',
-      lastSeenAt: now,
-      metadata: {
-        ...(input.existing.metadata ?? {}),
-        source: input.identity.source,
-      },
-    }
-  }
-
-  return {
-    id: crypto.randomUUID(),
-    actor,
-    workspace: input.identity.workspace,
-    currentRoleId: input.currentRoleId,
-    scope: 'shell',
-    status: 'active',
-    startedAt: now,
-    lastSeenAt: now,
-    metadata: {
-      source: input.identity.source,
-    },
-  }
-}
-
 export async function resolveShellSession(input: {
   requestedRoleId?: string | null
   sessionId?: string | null
@@ -119,8 +72,12 @@ export async function resolveShellSession(input: {
   const identity = readShellIdentity(input.headers)
   const existing = input.sessionId ? await getStoredShellSession(input.sessionId) : null
   const shellSession = await upsertStoredShellSession(
-    buildShellSession({
-      identity,
+    createLocalShellSession({
+      identity: {
+        actorId: identity.actorId,
+        workspace: identity.workspace,
+        source: identity.source,
+      },
       currentRoleId: policySession.currentRoleId,
       existing,
     }),
