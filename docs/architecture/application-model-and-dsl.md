@@ -27,13 +27,49 @@ Today, useful pieces exist in separate places: process graph (`BusinessProcessDe
 
 ---
 
-## 3. High-level view
+## 3. Single entry point and namespace grammar (tsops-aligned)
+
+Hand-authoring several parallel calls (`defineProcess`, `defineProcessUi`, `defineWorkspace`, …) is **not** the target UX. It splits one application across APIs and repeats identifiers. The **target** matches how tsops works:
+
+### 3.1 One entry module
+
+- **One** authored artifact per application or workspace template—e.g. `worken.app.ts` / `worken.config.ts` / one validated YAML document—**one default export** (or one schema-validated root object).
+- The same module is what **humans edit**, what **CI validates**, what **agents patch**, and what **tools load**—mirroring `tsops.config.*` as the single place Commander and runtime both use.
+
+### 3.2 Namespaces define grammar, not just nesting
+
+In tsops, **namespaces** are a first-class axis: they shape resolution (labels, resources, secrets, templates, env) and appear consistently in helpers. For Worken OS CAM:
+
+- **Nested structure is the grammar**: which processes, states, events, and surfaces exist must follow from the **tree** (e.g. workspace → app → process → state), not from unrelated top-level objects that must stay in sync by hand.
+- **Scopes** (product line, tenant template, environment) should be **namespace-shaped** the same way tsops scopes deploy targets—one resolver walks the tree instead of many ad hoc maps.
+
+### 3.3 Helpers come from the same tree
+
+As tsops reuses the **same** config for `plan` / `deploy` **and** runtime helpers (`config.url(…)`, `config.env(…)`), CAM must feed:
+
+- **Authoring-time** helpers: stable path constructors, state/surface/event ids **derived** from the namespace path so typos are impossible.
+- **Runtime** helpers (or generated accessors): e.g. semantic slots, binding targets, or shell routes **resolved** from the same definition the compiler uses—**not** a duplicate list of strings in app code.
+
+The split types in `@worken/dsl` (`BusinessProcessDefinition`, `ProcessUiDefinition`, …) remain **compiled IR** or **materialized views** produced from that single module—not the primary surface authors learn first.
+
+### 3.4 Comparison (intent)
+
+| tsops | Worken OS (target) |
+|--------|---------------------|
+| Single `tsops.config` module | Single CAM module per app / workspace template |
+| `NamespaceResolver` — grammar of deploy scope | Namespace-shaped CAM — grammar of process/UI scope |
+| `createConfigResolver` → lazy helpers `config.url`, `config.env` | Resolver from CAM → helpers for paths, bindings, routes |
+| Planner / Builder consume same config | Compiler emits `@worken/dsl` IR + host artifacts from same CAM |
+
+---
+
+## 4. High-level view
 
 ```
 ┌────────────────── Authoring (human + AI) ──────────────────┐
 │  Canonical Application Model (CAM)                          │
-│  • YAML or TypeScript module with schema / codegen          │
-│  • One document per app (or workspace template)             │
+│  • One module / one root document (see §3)                  │
+│  • Namespace tree defines grammar + scope                   │
 └────────────────────────────┬────────────────────────────────┘
                              │
                              ▼
@@ -59,7 +95,7 @@ Today, useful pieces exist in separate places: process graph (`BusinessProcessDe
 
 ---
 
-## 4. Canonical Application Model (CAM) — conceptual shape
+## 5. Canonical Application Model (CAM) — conceptual shape
 
 CAM is **not** a second parallel standard forever: it is the **authoring projection** that compiles **to** the types already defined in `@worken/dsl`. Conceptually it groups:
 
@@ -76,7 +112,7 @@ CAM is **not** a second parallel standard forever: it is the **authoring project
 
 ---
 
-## 5. Mapping CAM → existing `@worken/dsl` types
+## 6. Mapping CAM → existing `@worken/dsl` types
 
 This table is the **contract** for implementors of the compiler and for agents editing the repo.
 
@@ -96,7 +132,7 @@ This table is the **contract** for implementors of the compiler and for agents e
 
 ---
 
-## 6. Layering (aligned with `semantic-stack`)
+## 7. Layering (aligned with `semantic-stack`)
 
 The intentional order remains:
 
@@ -110,7 +146,7 @@ CAM **spans** layers 1–5 in authoring form; the compiler **splits** it into th
 
 ---
 
-## 7. Data-binding and DX
+## 8. Data-binding and DX
 
 **Authoring:** CAM should describe **intent** (which semantic paths feed which UI slots) in a stable notation; the compiler emits:
 
@@ -126,7 +162,7 @@ CAM **spans** layers 1–5 in authoring form; the compiler **splits** it into th
 
 ---
 
-## 8. Human + AI collaboration patterns
+## 9. Human + AI collaboration patterns
 
 | Practice | Why |
 |----------|-----|
@@ -138,7 +174,7 @@ CAM **spans** layers 1–5 in authoring form; the compiler **splits** it into th
 
 ---
 
-## 9. Repository layout (target)
+## 10. Repository layout (target)
 
 Exact names may evolve; intent:
 
@@ -149,7 +185,7 @@ Exact names may evolve; intent:
 
 ---
 
-## 10. Migration strategy (incremental)
+## 11. Migration strategy (incremental)
 
 1. Document CAM shape and mapping (this file).
 2. Add **cross-reference validation** in compiler or extended `validateWorkspace` (surface state ids ⊆ graph states).
@@ -158,7 +194,7 @@ Exact names may evolve; intent:
 
 ---
 
-## 11. Useful links (code)
+## 12. Useful links (code)
 
 | Topic | Location |
 |-------|----------|
@@ -170,4 +206,4 @@ Exact names may evolve; intent:
 
 ---
 
-*When adding CAM compiler packages or changing emitted types, update §5 and §9 in the same change.*
+*When adding CAM compiler packages or changing emitted types, update §6 and §10 in the same change.*
