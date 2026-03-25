@@ -1,6 +1,7 @@
 #!/usr/bin/env bun
 /**
  * CLI shell — same semantic enrichment pipeline as web-shell (`@worken/shell-runtime`).
+ * Spike: demo roles/domains and minimal Spec; not a full Worken OS entrypoint (no process API / chat shell yet).
  */
 import type { Spec } from '@json-render/core'
 import inquirer from 'inquirer'

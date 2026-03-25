@@ -1,8 +1,13 @@
-import type { ProcessDomainBridge, WorkspaceDefinition } from '@worken/dsl'
-import type { BusinessProcessDefinition, ProcessId } from '@worken/dsl'
-import type { ProcessUiDefinition } from '@worken/dsl'
-import type { UiWidgetRegion } from '@worken/dsl'
-import type { WorkspaceDomainBridge } from '@worken/dsl'
+import type {
+  BusinessProcessDefinition,
+  DataBindingPlan,
+  ProcessDomainBridge,
+  ProcessId,
+  ProcessUiDefinition,
+  UiWidgetRegion,
+  WorkspaceDefinition,
+  WorkspaceDomainBridge,
+} from '@worken/dsl'
 import { assertValidProcess, assertValidWorkspace } from '@worken/dsl'
 import type { WorkenAppDefinition } from './types.js'
 
@@ -17,6 +22,8 @@ export type CompiledWorkenApp = {
       process: BusinessProcessDefinition
       ui: ProcessUiDefinition
       bridge?: ProcessDomainBridge
+      /** Same rules as authored for this process (targets unchanged). */
+      bindings?: DataBindingPlan
     }
   >
 }
@@ -125,10 +132,15 @@ export function compileWorkenApp(def: WorkenAppDefinition): CompiledWorkenApp {
     if (compiled.bridge !== undefined) {
       bridgeProcesses[compiled.process.id] = compiled.bridge
     }
+    const procBindings =
+      proc.bindings?.rules?.length !== undefined && proc.bindings.rules.length > 0
+        ? ({ rules: [...proc.bindings.rules] } satisfies DataBindingPlan)
+        : undefined
     byProcess[compiled.process.id] = {
       process: compiled.process,
       ui: compiled.ui,
       ...(compiled.bridge !== undefined ? { bridge: compiled.bridge } : {}),
+      ...(procBindings !== undefined ? { bindings: procBindings } : {}),
     }
   }
 

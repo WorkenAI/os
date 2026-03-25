@@ -130,5 +130,9 @@ const appDefinition = {
 
 export const app = defineWorkenApp(appDefinition)
 
-/** Use in server: enrichShellSpec(spec, { ...input, bindings: app.bindings }) */
+/**
+ * Enrichment: single-process app → `app.bindings` is flat (same `to` as authored).
+ * Multi-process: top-level `bindings` scopes targets under `/processes/:processId/...`;
+ * or use `compiled.byProcess[id].bindings` per active process.
+ */
 export const { bindings, compiled } = app

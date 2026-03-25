@@ -160,6 +160,17 @@ CAM **spans** layers 1–5 in authoring form; the compiler **splits** it into th
 - Fewer raw string paths in hand-written code; prefer **generated** pointers or **linted** conventions from CAM.
 - Single place to rename a field (CAM) instead of grep across process + UI + bindings.
 
+### 8.1 `defineWorkenApp` bindings merge (current behavior)
+
+- **`compiled.byProcess[processId].bindings`** — a copy of that process’s authored `bindings` (if any). Use this for **per-process** enrichment when only one process is active; targets stay as written (e.g. `/surface/headerTitle`).
+- **`app.bindings` (top-level)** — merged `DataBindingPlan` for hosts that want a **single** plan:
+  - **One process** with rules → **flat** merge (same targets as authored).
+  - **Several processes** with rules → **scoped** merge by default: each rule’s `to` is prefixed with `/processes/:processId`, and **duplicate targets after scoping throw** (collision detection). Override with `mergeBindingsMode: 'flat'` only when a single process contributes rules (otherwise throws).
+- `mergeBindings: false` → top-level `bindings` is empty; consumers must use **`compiled.byProcess[id].bindings`**.
+- **Full IR coverage** is still evolving: graph, UI, bridge, and **per-process bindings** are on `compiled`; the **root authoring object** remains the source for anything not yet emitted (documented explicitly so “compiled = complete IR” is not assumed).
+
+**Follow-up:** generated helpers that default `stateSlot` under `/processes/:id/...` when compiling multi-process apps, or Spec templates that read scoped paths.
+
 ---
 
 ## 9. Human + AI collaboration patterns
@@ -208,7 +219,8 @@ Exact names may evolve; intent:
 | Single-entry `defineWorkenApp` | `packages/worken-dsl-app/src/builder.ts` |
 | Example (IT request) | `examples/it-request-workspace/src/worken.app.ts` |
 | Shared shell runtime (web + CLI) | `packages/shell-runtime` (`enrichShellSpec`, session contract) |
-| CLI shell | `apps/cli-shell` (`worken-shell` — Inquirer + same enrichment) |
+| Package boundary note | [shell-runtime-package-scope.md](./shell-runtime-package-scope.md) |
+| CLI shell | `apps/cli-shell` (runtime reuse spike — not full OS entrypoint yet) |
 
 ---
 
