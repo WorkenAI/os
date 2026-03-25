@@ -60,6 +60,16 @@
         "@json-render/core": "^0.13.0",
       },
     },
+    "examples/it-request-workspace": {
+      "name": "@worken/example-it-request",
+      "dependencies": {
+        "@worken/dsl-app": "workspace:*",
+      },
+      "devDependencies": {
+        "@worken/tsconfig": "workspace:*",
+        "typescript": "^5.9.3",
+      },
+    },
     "packages/dsl": {
       "name": "@worken/dsl",
       "version": "0.0.1",
@@ -74,6 +84,17 @@
     "packages/tsconfig": {
       "name": "@worken/tsconfig",
       "version": "0.0.1",
+    },
+    "packages/worken-dsl-app": {
+      "name": "@worken/dsl-app",
+      "version": "0.0.1",
+      "dependencies": {
+        "@worken/dsl": "workspace:*",
+      },
+      "devDependencies": {
+        "@worken/tsconfig": "workspace:*",
+        "typescript": "^5.9.3",
+      },
     },
   },
   "packages": {
@@ -602,6 +623,10 @@
     "@worken/demo-data": ["@worken/demo-data@workspace:examples/demo"],
 
     "@worken/dsl": ["@worken/dsl@workspace:packages/dsl"],
+
+    "@worken/dsl-app": ["@worken/dsl-app@workspace:packages/worken-dsl-app"],
+
+    "@worken/example-it-request": ["@worken/example-it-request@workspace:examples/it-request-workspace"],
 
     "@worken/tsconfig": ["@worken/tsconfig@workspace:packages/tsconfig"],
 

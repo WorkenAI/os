@@ -179,9 +179,10 @@ CAM **spans** layers 1–5 in authoring form; the compiler **splits** it into th
 Exact names may evolve; intent:
 
 - `packages/dsl` — **runtime types**, validation helpers, `buildEnrichedSpec` (unchanged role).
+- `packages/worken-dsl-app` — **single-entry** `defineWorkenApp` + `compileWorkenApp` → `@worken/dsl` (implemented; evolves toward full CAM).
 - `packages/app-compiler` (or similar) — **CAM schema, parser, emit to dsl types** (optional future package).
 - `docs/architecture/` — this document; link from root README when the team agrees.
-- Application examples — **CAM sources** under `examples/` or product repos, not hand-duplicated `defineProcess` + `defineProcessUi` unless for tests.
+- Application examples — **CAM sources** under `examples/` or product repos, e.g. `examples/it-request-workspace/src/worken.app.ts`.
 
 ---
 
@@ -203,6 +204,8 @@ Exact names may evolve; intent:
 | Spec enrichment (shell) | `apps/web-shell/src/shell/server/semantic/enrich-spec.ts` |
 | Semantic evaluation context (shell) | `apps/web-shell/src/shell/server/semantic/evaluation-context.ts` |
 | Process validation | `packages/dsl/src/process/validate.ts` |
+| Single-entry `defineWorkenApp` | `packages/worken-dsl-app/src/builder.ts` |
+| Example (IT request) | `examples/it-request-workspace/src/worken.app.ts` |
 
 ---
 

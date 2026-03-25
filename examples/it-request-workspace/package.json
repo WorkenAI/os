@@ -1,0 +1,15 @@
+{
+  "name": "@worken/example-it-request",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check-types": "tsc --noEmit -p tsconfig.json"
+  },
+  "dependencies": {
+    "@worken/dsl-app": "workspace:*"
+  },
+  "devDependencies": {
+    "@worken/tsconfig": "workspace:*",
+    "typescript": "^5.9.3"
+  }
+}
