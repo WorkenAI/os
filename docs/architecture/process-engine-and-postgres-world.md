@@ -46,6 +46,11 @@ Consequences:
 
 Until the compiler/runtime wires this, transitions remain **declarative only**; the **target** execution path is **DSL + emitEvent → workflow step**, not ad hoc side effects only.
 
+**Reference implementation (demo):**
+
+- Pure transition: `applyProcessTransition` — `packages/dsl/src/process/transition.ts`.
+- Workflow where **each transition is a `'use step'`**: `runDslDemoWorkflow` — `apps/web-shell/src/execution/workflows/run-dsl-demo-workflow.ts` (demo `demoApprovalProcess` in `dsl-demo/demo-process.ts`). Start with `createWorkenOsWorld().startRun(runDslDemoWorkflow, [{ events: ['submit', 'approve'] }])` when wiring tests or admin tooling.
+
 ---
 
 ## 3. Target: process engine service
@@ -96,6 +101,8 @@ Semantic enrichment (`buildShellEvaluationContext` + `enrichShellSpec`) is **opt
 | Workflow World wrapper | `apps/web-shell/src/execution/world.ts` |
 | Execution / signals (today) | `apps/web-shell/src/execution/service.ts`, `store.ts` |
 | DSL process types | `packages/dsl/src/process/types.ts` |
+| `applyProcessTransition` | `packages/dsl/src/process/transition.ts` |
+| DSL → workflow steps (demo) | `apps/web-shell/src/execution/workflows/run-dsl-demo-workflow.ts` |
 | Shell semantic runtime | `packages/shell-runtime` |
 | Process manager (WorkItem, web + CLI) | [process-manager.md](./process-manager.md) |
 
