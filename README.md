@@ -93,7 +93,7 @@ flowchart TB
 
 | Path | Role |
 |------|------|
-| `apps/landing` | Next.js app (marketing / shell entrypoints) |
+| `apps/web-shell` | Next.js app (marketing / shell entrypoints) |
 | `packages/tsconfig` | Shared TypeScript presets (`@worken/tsconfig`) |
 
 ## Development

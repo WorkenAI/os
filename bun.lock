@@ -9,8 +9,8 @@
         "turbo": "^2.8.20",
       },
     },
-    "apps/landing": {
-      "name": "@worken/landing",
+    "apps/web-shell": {
+      "name": "@worken/web-shell",
       "version": "0.0.1",
       "dependencies": {
         "@json-render/core": "^0.13.0",
@@ -21,6 +21,8 @@
         "@radix-ui/react-slot": "^1.2.4",
         "@radix-ui/react-tooltip": "^1.2.8",
         "@tanstack/react-query": "^5.90.21",
+        "@worken/demo-data": "workspace:*",
+        "@worken/dsl": "workspace:*",
         "@workflow/core": "^4.2.0-beta.71",
         "@workflow/next": "^4.0.1-beta.67",
         "@workflow/world-postgres": "^4.1.0-beta.45",
@@ -51,17 +53,27 @@
         "typescript": "^5.9.3",
       },
     },
-    "packages/tsconfig": {
-      "name": "@worken/tsconfig",
+    "examples/demo": {
+      "name": "@worken/demo-data",
       "version": "0.0.1",
+      "dependencies": {
+        "@json-render/core": "^0.13.0",
+      },
     },
-    "packages/utils": {
-      "name": "@worken/utils",
+    "packages/dsl": {
+      "name": "@worken/dsl",
       "version": "0.0.1",
+      "dependencies": {
+        "@json-render/core": "^0.13.0",
+      },
       "devDependencies": {
         "@worken/tsconfig": "workspace:*",
         "typescript": "^5.9.3",
       },
+    },
+    "packages/tsconfig": {
+      "name": "@worken/tsconfig",
+      "version": "0.0.1",
     },
   },
   "packages": {
@@ -587,11 +599,13 @@
 
     "@vercel/queue": ["@vercel/queue@0.1.4", "", { "dependencies": { "@vercel/oidc": "^3.0.5", "minimatch": "^10.2.4", "mixpart": "0.0.5", "picocolors": "^1.1.1" } }, "sha512-wo+jCycmCX078vQSbkX+RcLvySONDCK0f9aQp5UMKQD1+B+xKt3YVbIYbZukvoHQpbm5nnk6If+ADSeK/PmCgQ=="],
 
-    "@worken/landing": ["@worken/landing@workspace:apps/landing"],
+    "@worken/demo-data": ["@worken/demo-data@workspace:examples/demo"],
+
+    "@worken/dsl": ["@worken/dsl@workspace:packages/dsl"],
 
     "@worken/tsconfig": ["@worken/tsconfig@workspace:packages/tsconfig"],
 
-    "@worken/utils": ["@worken/utils@workspace:packages/utils"],
+    "@worken/web-shell": ["@worken/web-shell@workspace:apps/web-shell"],
 
     "@workflow/astro": ["@workflow/astro@4.0.0-beta.45", "", { "dependencies": { "@swc/core": "1.15.3", "@workflow/builders": "4.0.1-beta.62", "@workflow/rollup": "4.0.0-beta.28", "@workflow/swc-plugin": "4.1.0-beta.20", "@workflow/vite": "4.0.0-beta.21", "exsolve": "^1.0.8", "pathe": "^2.0.3" } }, "sha512-QRSXwhpjpu3JucO+iT2Bdkxm+3y1rmDWCYQ1RrgB7WXiZUlWobGo9dWxkew2pRw/MsBcO7jlGZjazVvCv3JhUQ=="],
 

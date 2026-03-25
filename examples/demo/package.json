@@ -1,0 +1,18 @@
+{
+  "name": "@worken/demo-data",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./mock-runtime-data.ts",
+    "./shell-catalog": "./shell-catalog.ts",
+    "./shell-contract": "./shell-contract.ts",
+    "./domains/catalog": "./domains/catalog.ts",
+    "./domains/types": "./domains/types.ts",
+    "./domains/hr": "./domains/hr/index.ts",
+    "./domains/sales": "./domains/sales/index.ts"
+  },
+  "dependencies": {
+    "@json-render/core": "^0.13.0"
+  }
+}

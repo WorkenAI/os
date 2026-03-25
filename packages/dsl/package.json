@@ -1,0 +1,28 @@
+{
+  "name": "@worken/dsl",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Declarative business process + UI binding DSL for Worken OS",
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "clean": "rm -rf dist .turbo",
+    "check-types": "tsc --noEmit -p tsconfig.json",
+    "lint": "biome lint src"
+  },
+  "dependencies": {
+    "@json-render/core": "^0.13.0"
+  },
+  "devDependencies": {
+    "@worken/tsconfig": "workspace:*",
+    "typescript": "^5.9.3"
+  }
+}

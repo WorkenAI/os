@@ -966,6 +966,18 @@ Action availability must come from semantic evaluation, not only UI flags.
 
 ---
 
+## Host manifests and policy identifiers (informative)
+
+A product shell may ship a **host manifest** alongside compiled action cards: navigation, views, entity metadata, and **policy grants**. Those layers are not defined by this specification’s normative minimal schema, but they must stay consistent with it.
+
+**Stable identity.** The normative `id` (`domain`, `object`, `action` composed into a single string) is the canonical semantic identifier for an action. Host policy stores MAY scope grants by **entity type + short `action` name** (for example `create`, `edit`) when the runtime can map that pair to a single action card’s `id`.
+
+**No duplication required.** This specification does not require the host manifest to repeat every action-card field. It requires that a compliant compiler or join step can produce a semantic graph where stable IDs, roles, predicates, blockers, effects, and UI hints remain evaluable as described in normative sections above.
+
+**Empty `when` and `blocked`.** Structural rule 5 requires explicit blockers when `when` is non-empty. When `when` is empty (action always eligible for the listed roles, subject to runtime context), `blocked` MAY be empty; blockers explain failures of the `when` conjunction, not alternate product rules.
+
+---
+
 ## Summary
 
 Worken OS Semantic Protocol is a shared semantic layer for humans, agents, and runtimes.
