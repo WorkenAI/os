@@ -15,3 +15,4 @@ export {
   validateProcess,
   type ProcessValidationIssue,
 } from './validate.js'
+export { applyProcessTransition, type ApplyProcessTransitionResult } from './transition.js'

@@ -1,0 +1,30 @@
+{
+  "name": "@worken/shell-runtime",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Shared Worken OS shell session types and semantic Spec enrichment (web-shell + cli-shell)",
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "clean": "rm -rf dist .turbo",
+    "check-types": "tsc --noEmit -p tsconfig.json",
+    "lint": "biome lint src"
+  },
+  "dependencies": {
+    "@worken/dsl": "workspace:*",
+    "@json-render/core": "^0.13.0"
+  },
+  "devDependencies": {
+    "@types/node": "^25.3.0",
+    "@worken/tsconfig": "workspace:*",
+    "typescript": "^5.9.3"
+  }
+}

@@ -1,11 +1,10 @@
 import type { Spec } from '@json-render/core'
 import { buildEnrichedSpec } from '@worken/dsl'
-import { buildShellEvaluationContext } from './evaluation-context'
-import type { ShellSemanticEnrichmentInput } from './shell-semantic-input'
+import { buildShellEvaluationContext } from './evaluation-context.js'
+import type { ShellSemanticEnrichmentInput } from './shell-semantic-input.js'
 
 /**
- * Server-only: merges WorkSession-backed semantic state into a json-render `Spec`.
- * Call only from API routes / server orchestration after `resolveShellSession`.
+ * Merges WorkSession-backed semantic state into a json-render `Spec`.
  */
 export function enrichShellSpec(
   spec: Spec | null,

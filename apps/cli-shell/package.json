@@ -1,0 +1,26 @@
+{
+  "name": "@worken/cli-shell",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Interactive CLI shell — same @worken/shell-runtime as web-shell",
+  "type": "module",
+  "bin": {
+    "worken-shell": "./src/index.ts"
+  },
+  "scripts": {
+    "start": "bun run src/index.ts",
+    "lint": "biome lint src",
+    "check-types": "bunx --bun tsc --noEmit"
+  },
+  "dependencies": {
+    "@worken/shell-runtime": "workspace:*",
+    "@worken/dsl": "workspace:*",
+    "@json-render/core": "^0.13.0",
+    "inquirer": "^12.11.1"
+  },
+  "devDependencies": {
+    "@types/node": "^25.3.0",
+    "@worken/tsconfig": "workspace:*",
+    "typescript": "^5.9.3"
+  }
+}

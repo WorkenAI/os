@@ -1,5 +1,5 @@
 import type { EvaluationContext } from '@worken/dsl'
-import type { ShellSemanticEnrichmentInput } from './shell-semantic-input'
+import type { ShellSemanticEnrichmentInput } from './shell-semantic-input.js'
 
 /**
  * Maps shell session + permissions into protocol {@link EvaluationContext}.
