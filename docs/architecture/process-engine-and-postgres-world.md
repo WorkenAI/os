@@ -17,7 +17,7 @@ This document ties together:
 | **Process definition** | What states exist, which **events** are legal from each state, who **actors** are. Pure data; no IO. |
 | **Process instance** | Current `StateId`, correlation ids, timestamps, payload — **persisted** (Postgres). |
 | **Transition execution** | Apply event → validate edge → new state → side effects (notifications, AI tasks). **Not** the React tree. |
-| **Workflow World** | Where long-running work, retries, and **durable** execution live (`start` / `getRun` — see `apps/web-shell/src/execution/world.ts`). |
+| **Workflow World** | Durable runs (`start` / `getRun` — `apps/web-shell/src/execution/world.ts`). **Mapping:** DSL **transitions** are intended to become **workflow steps** (§2.1). |
 | **UI (web / CLI)** | Optional: observe instance, emit **events** that the engine consumes, or render `enrichShellSpec` for a snapshot. |
 
 **Rule:** Process **movement** must not depend on a browser. UI and CLI are **clients** of the same engine API.
@@ -32,6 +32,19 @@ The app already resolves world kind from the environment:
 - `createWorkenOsWorld()` wraps `@workflow/core/runtime` (`getWorld`, `start`, `getRun`) — see `apps/web-shell/src/execution/world.ts`.
 
 That stack is suited to **workflows** (signal-driven cases, checkpoints). **BPM DSL process instances** are not yet first-class rows in the same store; this document defines how to align them.
+
+### 2.1 DSL transitions → workflow steps (normative intent)
+
+**Design intent:** a **transition** in `BusinessProcessDefinition` (an edge selected by `EventId` when leaving a state) is not only a data-structure change — it is meant to become a **step** in a **Workflow** run backed by World (Postgres or other).
+
+Consequences:
+
+- **One emitted event** that moves the instance along an edge → **one workflow step** (or one atomic segment between durable checkpoints), with correlation ids linking **process instance id** ↔ **workflow run id**.
+- **Idempotency** — step ids / replay semantics align with workflow’s model so retries and agents do not double-apply transitions.
+- **Observability** — operators see the same run in workflow tooling; **DSL state** is a projection of / checkpoint alongside the workflow position.
+- **Gateways / parallel branches** — map to workflow parallelism or child runs as the engine matures (exact mapping is implementation detail; the rule is: graph semantics drive step structure).
+
+Until the compiler/runtime wires this, transitions remain **declarative only**; the **target** execution path is **DSL + emitEvent → workflow step**, not ad hoc side effects only.
 
 ---
 
@@ -71,7 +84,7 @@ Semantic enrichment (`buildShellEvaluationContext` + `enrichShellSpec`) is **opt
 
 1. **Tables** — `process_instances` (id, `process_id`, `version`, `current_state`, `payload`, …), `process_events` (append-only).
 2. **Engine module** — load `BusinessProcessDefinition`, run `validateProcess` at deploy; at runtime validate `on` / `from` / `to`.
-3. **Adapter** — optional Workflow step that calls `emitEvent` so existing `createWorkenOsWorld().startRun` orchestrates DSL transitions.
+3. **Workflow adapter** — generated or hand-mapped **workflow** whose **steps** correspond to DSL **transitions** (see §2.1); `createWorkenOsWorld().startRun` runs that workflow so Postgres World records each transition as durable work.
 4. **Agent path** — issue credentials + session; restrict events via policy.
 
 ---
